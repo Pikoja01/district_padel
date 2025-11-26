@@ -1,10 +1,18 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { SEOHead } from "@/components/layout/SEOHead";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <>
+      <SEOHead
+        title="Dobrodošli u District Padel"
+        description="Vaša vrhunska padel destinacija u Sremskoj Mitrovici"
+        keywords="padel srbija, padel sremska mitrovica, padel klub srbija, padel teren srbija, district padel, dobrodošli"
+        canonicalUrl="https://districtpadel.rs/"
+      />
+      <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center space-y-6 px-4">
         <h1 className="mb-4 text-4xl md:text-5xl font-bold">Dobrodošli u District Padel</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -22,6 +30,7 @@ const Index = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

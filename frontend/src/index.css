@@ -46,6 +46,7 @@ All colors MUST be HSL.
     --gradient-card: linear-gradient(165deg, hsl(220 15% 12%), hsl(220 15% 8%));
     --glow-primary: 0 0 20px hsl(189 94% 43% / 0.3);
     --glow-secondary: 0 0 20px hsl(84 81% 44% / 0.3);
+    --glow-accent: 0 0 20px hsl(25 95% 53% / 0.3);
   }
 
   .dark {
@@ -119,5 +120,21 @@ All colors MUST be HSL.
   
   .glow-secondary {
     box-shadow: var(--glow-secondary);
+  }
+  
+  .glow-accent {
+    box-shadow: var(--glow-accent);
+  }
+  
+  a.link-accent,
+  button.link-accent,
+  .link-accent {
+    color: hsl(var(--accent)) !important;
+  }
+  
+  a.link-accent:hover,
+  button.link-accent:hover,
+  .link-accent:hover {
+    color: hsl(var(--accent)) !important;
   }
 }

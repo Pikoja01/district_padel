@@ -113,7 +113,7 @@ export default function PadelSrbija() {
               <Target className="w-10 h-10 text-accent mb-3" />
               <h3 className="font-bold text-xl mb-2">Lako za učenje</h3>
               <p className="text-muted-foreground text-sm">
-                Pravila za savladavanje osnovnih pravila igre za nekoliko treninga
+              Osnovne pravila se mogu savladati za nekoliko puta igranja
               </p>
             </Card>
           </div>

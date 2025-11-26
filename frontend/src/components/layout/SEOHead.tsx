@@ -54,15 +54,15 @@ export function SEOHead({
     canonical.href = canonicalUrl;
 
     if (structuredData) {
-      let script = document.querySelector('script[type="application/ld+json"]') as HTMLScriptElement;
+      let script = document.querySelector('script[type="application/ld+json"][data-seo-head="true"]') as HTMLScriptElement;
       if (!script) {
         script = document.createElement("script");
         script.type = "application/ld+json";
+        script.setAttribute("data-seo-head", "true");
         document.head.appendChild(script);
       }
       script.textContent = JSON.stringify(structuredData);
-    }
-  }, [title, description, keywords, canonicalUrl, ogImage, structuredData]);
+    }  }, [title, description, keywords, canonicalUrl, ogImage, structuredData]);
 
   return null;
 }

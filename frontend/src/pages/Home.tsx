@@ -87,15 +87,18 @@ export default function Home() {
                 </Button>
               </Card>
 
-              <Card className="glass p-8 hover:glow-primary transition-all">
+              <Card className="glass p-8 hover:glow-accent transition-all">
                 <Calendar className="w-12 h-12 text-accent mb-4" />
                 <h3 className="text-2xl font-bold mb-2">Laka Rezervacija</h3>
                 <p className="text-muted-foreground">
                   Rezervišite termin online za nekoliko minuta. Dostupno 7 dana u nedelji.
                 </p>
-                <Button variant="link" className="mt-4 text-accent p-0" asChild>
-                  <Link to="/contact">Kontaktiraj nas →</Link>
-                </Button>
+                <Link 
+                  to="/contact" 
+                  className="mt-4 inline-flex items-center link-accent underline-offset-4 hover:underline transition-colors"
+                >
+                  Kontaktiraj nas →
+                </Link>
               </Card>
             </div>
           </div>

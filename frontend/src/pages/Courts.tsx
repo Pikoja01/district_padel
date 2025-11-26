@@ -32,9 +32,8 @@ export default function Courts() {
               </Badge>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Padel je sport koji kombinuje elemente tenisa, skvosa i tenisa na zidu. Stvarajući tako prvi padel teren uz obično igra u dublovima, što doprinosi opuštenoj i prijateljskoj atmosferi. Pravila su laka za savladati, a teren je manji od teniskog, što olakšava igru.
-            </p>
-            
+              Padel je sport koji kombinuje elemente tenisa, skvosa i tenisa na zidu. Stvarajući tako prvi padel teren gde se uobičajeno igra u dublovima, što doprinosi opuštenoj i prijateljskoj atmosferi. Pravila su laka za savladati, a teren je manji od teniskog, što olakšava igru.
+            </p>            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="bg-card/40 p-6 space-y-4">
                 <h3 className="text-xl font-bold text-primary">Dimenzije</h3>
@@ -134,7 +133,7 @@ export default function Courts() {
               </Badge>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Zašto je District teretana idealno mesto za tvoj trening? Zato što smo možda jedini potpuno privatnost - 90 minuta treninga u prostoru gde nema guzve i gde ti niko neće zauzeti spravu. Ovde imaš sve na svom mestu: kvalitetne sprave koje energišu optimalan trening, a ti sam biraš muziku koja će te motivisati tokom celog procesa. Sve usluge koje pratiš, od personalnog pristupa do ekskluzivnosti prostora, doprinose stvaranju savršenog ambijenta za tvoje fitness ciljeve.
+              Zašto je District teretana idealno mesto za tvoj trening? Zato što smo možda jedini koji nudi potpunu privatnost - 90 minuta treninga u prostoru gde nema guzve i gde ti niko neće zauzeti spravu. Ovde imaš sve na svom mestu: kvalitetne sprave koje omogućavaju optimalan trening, a ti sam biraš muziku koja će te motivisati tokom celog procesa. Sve usluge koje pratiš, od personalnog pristupa do ekskluzivnosti prostora, doprinose stvaranju savršenog ambijenta za tvoje fitness ciljeve.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="bg-card/40 p-6 space-y-4">
