@@ -20,6 +20,41 @@ from app.services.team_service import validate_team_creation, archive_team, acti
 router = APIRouter()
 
 
+async def generate_team_name_from_players(players: List[TeamPlayerCreate], db: AsyncSession) -> str:
+    """
+    Generate team name from players' surnames.
+    Takes the 2nd word (surname) from each player's name, extracts first 3 letters,
+    converts to uppercase, and joins them with " | " separator.
+    
+    Example: "Marko Markovic", "Stefan Nikolic" -> "MAR | NIK"
+    Example: "Marko Markovic", "Stefan Nikolic", "Luka Petrovic" -> "MAR | NIK | PET"
+    """
+    surnames = []
+    
+    for player_data in players:
+        if player_data.name:
+            # Get surname (2nd word) from player name
+            name_parts = player_data.name.strip().split()
+            if len(name_parts) >= 2:
+                surname = name_parts[1]  # 2nd word is surname
+                # Take first 3 letters, uppercase
+                surname_code = surname[:3].upper()
+                surnames.append(surname_code)
+        elif player_data.player_id:
+            # Fetch player from database to get name
+            result = await db.execute(select(Player).where(Player.id == player_data.player_id))
+            player = result.scalar_one_or_none()
+            if player:
+                name_parts = player.name.strip().split()
+                if len(name_parts) >= 2:
+                    surname = name_parts[1]
+                    surname_code = surname[:3].upper()
+                    surnames.append(surname_code)
+    
+    # Combine all surname codes with " | " separator
+    return " | ".join(surnames) if surnames else "TEAM"
+
+
 async def _process_team_players(
     db: AsyncSession,
     player_data_list: List[TeamPlayerCreate]
@@ -67,19 +102,24 @@ async def create_team(
     # Validate team composition
     await validate_team_creation(team_data.players, db)
     
+    # Generate team name if not provided
+    team_name = team_data.name
+    if not team_name or not team_name.strip():
+        team_name = await generate_team_name_from_players(team_data.players, db)
+    
     # Check if team name already exists
     existing_team = await db.execute(
-        select(Team).where(Team.name == team_data.name)
+        select(Team).where(Team.name == team_name)
     )
     if existing_team.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Team with name '{team_data.name}' already exists",
+            detail=f"Team with name '{team_name}' already exists",
         )
     
     # Create team
     team = Team(
-        name=team_data.name,
+        name=team_name,
         group=team_data.group,
         active=True,
     )
@@ -219,17 +259,33 @@ async def update_team(
         raise HTTPException(status_code=404, detail="Team not found")
     
     # Update fields
+    # Handle team name: if explicitly provided (even if empty), update it
     if team_data.name is not None:
-        # Check if new name conflicts with existing team
+        team_name = team_data.name.strip() if team_data.name else ""
+        
+        # If name is empty, generate from players
+        if not team_name:
+            # Use players from update if provided, otherwise use existing team players
+            if team_data.players:
+                team_name = await generate_team_name_from_players(team_data.players, db)
+            else:
+                # Use existing team players
+                team_name = await generate_team_name_from_players(
+                    [TeamPlayerCreate(name=tp.player.name, role=tp.role.value.lower()) 
+                     for tp in team.team_players], 
+                    db
+                )
+        
+        # Check for conflicts with the new name
         existing = await db.execute(
-            select(Team).where(Team.name == team_data.name, Team.id != team_id)
+            select(Team).where(Team.name == team_name, Team.id != team_id)
         )
         if existing.scalar_one_or_none():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Team with name '{team_data.name}' already exists",
+                detail=f"Team with name '{team_name}' already exists",
             )
-        team.name = team_data.name
+        team.name = team_name
     
     if team_data.group is not None:
         team.group = team_data.group

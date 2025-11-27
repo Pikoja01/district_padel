@@ -99,7 +99,10 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> List[str]:
         """Parse CORS origins from comma-separated string"""
-        return self._csv_to_list(self.CORS_ORIGINS)
+        origins = self._csv_to_list(self.CORS_ORIGINS)
+        # Filter out empty strings and strip whitespace
+        origins = [origin.strip() for origin in origins if origin.strip()]
+        return origins
 
     @property
     def cors_allow_methods_list(self) -> List[str]:

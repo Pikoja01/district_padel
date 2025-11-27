@@ -11,6 +11,42 @@ from app.api.v1.public.router import router as public_router
 from app.api.v1.admin.router import router as admin_router
 
 
+def validate_cors_origins_on_startup() -> None:
+    """
+    Validate CORS_ORIGINS on application startup.
+    This ensures CORS is properly configured for production.
+    """
+    try:
+        cors_origins = settings.CORS_ORIGINS
+        cors_origins_list = settings.cors_origins_list
+        
+        if not cors_origins or not cors_origins.strip():
+            print("=" * 80, file=sys.stderr)
+            print("WARNING: CORS_ORIGINS is not set", file=sys.stderr)
+            print("=" * 80, file=sys.stderr)
+            print("\nCORS requests will be blocked. Please set CORS_ORIGINS environment variable.", file=sys.stderr)
+            print("\nFor deployment on Render:", file=sys.stderr)
+            print("  1. Go to your web service → Environment tab", file=sys.stderr)
+            print("  2. Set CORS_ORIGINS to your frontend URL(s)", file=sys.stderr)
+            print("  3. Format: https://your-frontend.vercel.app (comma-separated for multiple)", file=sys.stderr)
+            print("\nExample: https://district-padel.vercel.app", file=sys.stderr)
+            print("=" * 80, file=sys.stderr)
+            return  # Don't exit, just warn
+        
+        if not cors_origins_list:
+            print("=" * 80, file=sys.stderr)
+            print("WARNING: CORS_ORIGINS is empty after parsing", file=sys.stderr)
+            print("=" * 80, file=sys.stderr)
+            print(f"\nCORS_ORIGINS value: '{cors_origins}'", file=sys.stderr)
+            print("CORS requests will be blocked.", file=sys.stderr)
+            print("=" * 80, file=sys.stderr)
+            return
+        
+        print(f"✓ CORS configured for origins: {cors_origins_list}", flush=True)
+    except Exception as e:
+        print(f"WARNING: Failed to validate CORS_ORIGINS: {e}", file=sys.stderr, flush=True)
+
+
 def validate_database_url_on_startup() -> None:
     """
     Validate DATABASE_URL on application startup.
@@ -70,6 +106,9 @@ async def lifespan(app: FastAPI):
     validate_database_url_on_startup()
     print("✓ DATABASE_URL validated successfully", flush=True)
     
+    # Startup: Validate CORS configuration
+    validate_cors_origins_on_startup()
+    
     yield
     
     # Shutdown: Add any cleanup logic here if needed in the future
@@ -87,9 +126,14 @@ app = FastAPI(
 )
 
 # Configure CORS - must be added before routers to handle error responses
+# Log CORS origins for debugging (in production, check logs to verify)
+cors_origins = settings.cors_origins_list
+print(f"CORS Origins configured: {cors_origins}", flush=True)
+print(f"CORS_ORIGINS env var: {settings.CORS_ORIGINS}", flush=True)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=settings.cors_allow_methods_list,
     allow_headers=settings.cors_allow_headers_list,
