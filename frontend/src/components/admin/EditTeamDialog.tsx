@@ -88,11 +88,6 @@ export function EditTeamDialog({ teamId, open, onOpenChange }: EditTeamDialogPro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!teamName.trim()) {
-      alert("Ime tima je obavezno");
-      return;
-    }
-
     const mainPlayers = players.filter((p) => p.role === "main" && p.name.trim());
     if (mainPlayers.length < 2) {
       alert("Tim mora imati najmanje 2 glavna igrača");
@@ -114,7 +109,7 @@ export function EditTeamDialog({ teamId, open, onOpenChange }: EditTeamDialogPro
       await updateTeam.mutateAsync({
         teamId,
         data: {
-          name: teamName.trim(),
+          name: teamName.trim() || "", // Send empty string if cleared, backend will generate
           group,
           players: playersToSubmit,
         },
@@ -148,12 +143,12 @@ export function EditTeamDialog({ teamId, open, onOpenChange }: EditTeamDialogPro
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="edit-team-name">Ime tima *</Label>
+              <Label htmlFor="edit-team-name">Ime tima (opciono - automatski generisano iz prezimena)</Label>
               <Input
                 id="edit-team-name"
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
-                required
+                placeholder="Ostavite prazno za automatsko generisanje iz prezimena"
                 disabled={updateTeam.isPending}
               />
             </div>

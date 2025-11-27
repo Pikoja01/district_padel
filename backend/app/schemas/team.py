@@ -48,7 +48,7 @@ class TeamPlayerCreate(BaseModel):
 
 class TeamBase(BaseModel):
     """Base team schema"""
-    name: str
+    name: Optional[str] = None
     group: GroupEnum
 
 

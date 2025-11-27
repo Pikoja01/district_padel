@@ -64,12 +64,6 @@ export function CreateTeamDialog({ open, onOpenChange }: CreateTeamDialogProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate
-    if (!teamName.trim()) {
-      alert("Ime tima je obavezno");
-      return;
-    }
-
     const playersToSubmit = players
       .filter((p) => p.name.trim())
       .map((p) => ({
@@ -89,7 +83,7 @@ export function CreateTeamDialog({ open, onOpenChange }: CreateTeamDialogProps) 
     }
     try {
       await createTeam.mutateAsync({
-        name: teamName.trim(),
+        name: teamName.trim() || undefined, // Send undefined if empty, backend will generate
         group,
         players: playersToSubmit,
       });
@@ -122,13 +116,12 @@ export function CreateTeamDialog({ open, onOpenChange }: CreateTeamDialogProps) 
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="team-name">Ime tima *</Label>
+            <Label htmlFor="team-name">Ime tima (opciono - automatski generisano iz prezimena)</Label>
             <Input
               id="team-name"
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
-              placeholder="Npr. Thunder Smash"
-              required
+              placeholder="Ostavite prazno za automatsko generisanje iz prezimena"
               disabled={createTeam.isPending}
             />
           </div>

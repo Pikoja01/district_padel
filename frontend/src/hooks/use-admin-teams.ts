@@ -96,7 +96,7 @@ export function useDeleteTeam() {
       queryClient.invalidateQueries({ queryKey: ["admin", "teams"] });
       queryClient.invalidateQueries({ queryKey: ["teams"] });
       queryClient.invalidateQueries({ queryKey: ["standings"] });
-      toast.success("Tim je uspešno arhiviran");
+      toast.success("Tim je uspešno obrisan");
     },
     onError: (error: any) => {
       toast.error(error?.message || "Greška pri brisanju tima");
