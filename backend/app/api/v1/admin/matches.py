@@ -213,6 +213,22 @@ async def update_match(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Home team and away team must be different",
         )
+
+    # Re-validate team groups if group or teams changed
+    if match_data.group is not None or match_data.home_team_id is not None or match_data.away_team_id is not None:
+        home_result = await db.execute(select(Team).where(Team.id == match.home_team_id))
+        away_result = await db.execute(select(Team).where(Team.id == match.away_team_id))
+        home_team = home_result.scalar_one_or_none()
+        away_team = away_result.scalar_one_or_none()
+        
+        if not home_team or not away_team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        if home_team.group != match.group or away_team.group != match.group:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Both teams must be in the same group as the match",
+            )
     
     await db.commit()
     await db.refresh(match, ["home_team", "away_team", "match_sets"])
