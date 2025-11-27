@@ -1,21 +1,90 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Trophy, Users } from "lucide-react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, Trophy, Users, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SEOHead } from "@/components/layout/SEOHead";
-import { teams } from "@/data/teams";
-import { matches } from "@/data/matches";
-import { calculateStandings } from "@/utils/calculateStandings";
+import { useTeam, useTeams } from "@/hooks/use-teams";
+import { useTeamStanding } from "@/hooks/use-standings";
+import { useMatches } from "@/hooks/use-matches";
+import type { Match } from "@/types";
 
 export default function TeamDetail() {
   const { teamId } = useParams();
   const navigate = useNavigate();
-  const team = teams.find((t) => t.id === teamId);
 
-  if (!team) {
+  const { data: team, isLoading: teamLoading, error: teamError } = useTeam(teamId);
+  const { data: teamStanding, isLoading: standingLoading } = useTeamStanding(teamId);
+  const { data: allMatches = [], isLoading: matchesIsLoading, error: matchesError } = useMatches({ status: "played" });
+  const { data: allTeams = [], isLoading: teamsIsLoading, error: teamsError } = useTeams();
+
+  const teamMatches = allMatches.filter(
+    (m) => (m.homeTeamId === teamId || m.awayTeamId === teamId)
+  );
+
+  const getOpponentName = (match: Match) => {
+    if (teamsError) {
+      return "Greška pri učitavanju timova";
+    }
+    const opponentId = match.homeTeamId === teamId ? match.awayTeamId : match.homeTeamId;
+    const opponent = allTeams.find((t) => t.id === opponentId);
+    return opponent?.name || "Nepoznat tim";
+  };
+
+  const getOpponentId = (match: Match) => {
+    return match.homeTeamId === teamId ? match.awayTeamId : match.homeTeamId;
+  };
+
+  const getResult = (match: Match) => {
+    if (!teamId) return { formatted: "", isWin: false };
+    
+    const isHome = match.homeTeamId === teamId;
+    const teamSets = isHome ? match.homeSets : match.awaySets;
+    const opponentSets = isHome ? match.awaySets : match.homeSets;
+    
+    const setsLength = Math.min(teamSets.length, opponentSets.length);
+    
+    let teamSetsWon = 0;
+    let opponentSetsWon = 0;
+    
+    for (let i = 0; i < setsLength; i++) {
+      if (teamSets[i] > opponentSets[i]) teamSetsWon++;
+      else if (opponentSets[i] > teamSets[i]) opponentSetsWon++;
+    }
+    
+    const isWin = teamSetsWon > opponentSetsWon;
+    
+    return {
+      formatted: Array.from({ length: setsLength }, (_, i) => `${teamSets[i]}:${opponentSets[i]}`).join(", "),
+      isWin,
+    };
+  };
+
+  const isLoading = teamLoading || standingLoading || matchesIsLoading || teamsIsLoading;
+
+  if (isLoading) {
     return (
       <main className="container mx-auto px-4 py-8">
+        <Skeleton className="h-10 w-32 mb-6" />
+        <div className="space-y-8">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </main>
+    );
+  }
+
+  if (teamError || !team) {
+    return (
+      <main className="container mx-auto px-4 py-8">
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {teamError ? "Greška pri učitavanju tima." : "Tim nije pronađen"}
+          </AlertDescription>
+        </Alert>
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Tim nije pronađen</h1>
           <Button onClick={() => navigate("/league")}>Nazad na tabelu</Button>
@@ -23,34 +92,6 @@ export default function TeamDetail() {
       </main>
     );
   }
-
-  const standings = calculateStandings(teams, matches);
-  const teamStanding = standings.find((s) => s.teamId === teamId);
-
-  const teamMatches = matches.filter(
-    (m) => (m.homeTeamId === teamId || m.awayTeamId === teamId) && m.status === "played"
-  );
-
-  const getOpponentName = (match: typeof matches[0]) => {
-    const opponentId = match.homeTeamId === teamId ? match.awayTeamId : match.homeTeamId;
-    return teams.find((t) => t.id === opponentId)?.name || "Unknown";
-  };
-
-  const getResult = (match: typeof matches[0]) => {
-    const isHome = match.homeTeamId === teamId;
-    const teamSets = isHome ? match.homeSets : match.awaySets;
-    const opponentSets = isHome ? match.awaySets : match.homeSets;
-    
-    const teamSetsWon = teamSets.filter((s, i) => s > opponentSets[i]).length;
-    const opponentSetsWon = opponentSets.filter((s, i) => s > teamSets[i]).length;
-    
-    const isWin = teamSetsWon > opponentSetsWon;
-    
-    return {
-      formatted: teamSets.map((s, i) => `${s}:${opponentSets[i]}`).join(", "),
-      isWin,
-    };
-  };
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -144,7 +185,14 @@ export default function TeamDetail() {
               <Trophy className="w-6 h-6 text-primary" />
               Nedavne utakmice
             </h2>
-            {teamMatches.length === 0 ? (
+            {matchesError ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Greška pri učitavanju utakmica. Molimo pokušajte ponovo.
+                </AlertDescription>
+              </Alert>
+            ) : teamMatches.length === 0 ? (
               <Card className="glass p-8 text-center text-muted-foreground">
                 Još nema odigranih utakmica
               </Card>
@@ -157,7 +205,15 @@ export default function TeamDetail() {
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex-1">
                           <div className="text-sm text-muted-foreground mb-1">{match.date}</div>
-                          <div className="font-semibold">vs {getOpponentName(match)}</div>
+                          <div className="font-semibold">
+                            vs{" "}
+                            <Link
+                              to={`/teams/${getOpponentId(match)}`}
+                              className="text-primary hover:underline transition-colors"
+                            >
+                              {getOpponentName(match)}
+                            </Link>
+                          </div>
                         </div>
                         <div className="text-right">
                           <div className="font-mono text-lg mb-1">{result.formatted}</div>

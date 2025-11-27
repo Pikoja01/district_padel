@@ -14,7 +14,7 @@ export type Team = {
   active: boolean;
 };
 
-export type MatchStatus = "scheduled" | "played";
+export type MatchStatus = "scheduled" | "in_progress" | "played" | "cancelled";
 
 export type Match = {
   id: string;
@@ -42,4 +42,20 @@ export type TeamStanding = {
   setDiff: number;
   gameDiff: number;
   position: number;
+};
+
+export type DashboardStats = {
+  teams: {
+    active: number;
+    total: number;
+    group_a: number;
+    group_b: number;
+  };
+  matches: {
+    scheduled: number;
+    in_progress: number;
+    played: number;
+    cancelled: number;
+    total: number;
+  };
 };

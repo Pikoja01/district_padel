@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AlertCircle } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,16 +9,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SEOHead } from "@/components/layout/SEOHead";
-import { teams } from "@/data/teams";
-import { matches } from "@/data/matches";
-import { calculateStandings } from "@/utils/calculateStandings";
+import { useStandings } from "@/hooks/use-standings";
 
 export default function LeagueGroupA() {
-  const standings = useMemo(
-    () => calculateStandings(teams, matches).filter((s) => s.group === "A"),
-    []
-  );
+  const navigate = useNavigate();
+  const { data: standings = [], isLoading, error } = useStandings({ group: "A" });
 
   return (
     <>
@@ -37,6 +35,15 @@ export default function LeagueGroupA() {
           <p className="text-lg text-muted-foreground">Tabela i statistika Grupe A</p>
         </div>
 
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Greška pri učitavanju tabele. Molimo pokušajte ponovo.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="rounded-lg border border-border overflow-x-auto glass mb-6">
           <Table>
             <TableHeader>
@@ -52,33 +59,75 @@ export default function LeagueGroupA() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {standings.map((standing, idx) => (
-                <TableRow key={standing.teamId} className="hover:bg-muted/50">
-                  <TableCell className="font-bold">{idx + 1}</TableCell>
-                  <TableCell>
-                    <Link
-                      to={`/teams/${standing.teamId}`}
-                      className="hover:text-primary transition-colors font-medium"
-                    >
-                      {standing.teamName}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-center">{standing.matchesPlayed}</TableCell>
-                  <TableCell className="text-center text-win">{standing.matchesWon}</TableCell>
-                  <TableCell className="text-center text-lose">{standing.matchesLost}</TableCell>
-                  <TableCell className="text-center">
-                    {standing.setDiff > 0 ? "+" : ""}
-                    {standing.setDiff}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {standing.gameDiff > 0 ? "+" : ""}
-                    {standing.gameDiff}
-                  </TableCell>
-                  <TableCell className="text-center font-bold text-primary text-lg">
-                    {standing.points}
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-8" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-12 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-12 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : standings.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    Nema timova u Grupi A
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                standings.map((standing) => (
+                  <TableRow 
+                    key={standing.teamId} 
+                    className="hover:bg-muted/50 cursor-pointer"
+                    onClick={() => navigate(`/teams/${standing.teamId}`)}
+                  >
+                    <TableCell className="font-bold">{standing.position}</TableCell>
+                    <TableCell>
+                      <Link
+                        to={`/teams/${standing.teamId}`}
+                        className="hover:text-primary transition-colors font-medium"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {standing.teamName}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-center">{standing.matchesPlayed}</TableCell>
+                    <TableCell className="text-center text-win">{standing.matchesWon}</TableCell>
+                    <TableCell className="text-center text-lose">{standing.matchesLost}</TableCell>
+                    <TableCell className="text-center">
+                      {standing.setDiff > 0 ? "+" : ""}
+                      {standing.setDiff}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {standing.gameDiff > 0 ? "+" : ""}
+                      {standing.gameDiff}
+                    </TableCell>
+                    <TableCell className="text-center font-bold text-primary text-lg">
+                      {standing.points}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
