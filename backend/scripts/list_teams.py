@@ -4,7 +4,8 @@ Script to list all teams
 import asyncio
 import httpx
 
-BASE_URL = "http://localhost:8001"USERNAME = "admin@test"
+BASE_URL = "http://localhost:8001"
+USERNAME = "admin@test"
 PASSWORD = "admin123"
 
 
