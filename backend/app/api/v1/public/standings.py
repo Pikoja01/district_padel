@@ -46,3 +46,4 @@ async def get_team_standings(
     
     return team_standing
 
+

@@ -5,7 +5,7 @@ from typing import List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
@@ -182,10 +182,11 @@ async def update_team(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Update team information.
-    Note: To update players, you'll need to delete and recreate team-player relationships.
+    Update team information including players.
     """
-    query = select(Team).where(Team.id == team_id)
+    query = select(Team).where(Team.id == team_id).options(
+        selectinload(Team.team_players).selectinload(TeamPlayer.player)
+    )
     result = await db.execute(query)
     team = result.scalar_one_or_none()
     
@@ -211,8 +212,46 @@ async def update_team(
     if team_data.active is not None:
         team.active = team_data.active
     
+    # Update players if provided
+    if team_data.players is not None:
+        # Validate team composition
+        await validate_team_creation(team_data.players, db)
+        
+        # Delete existing team-player relationships
+        await db.execute(
+            delete(TeamPlayer).where(TeamPlayer.team_id == team_id)
+        )
+        
+        # Process new players - create new ones if needed, or use existing IDs
+        player_ids_to_use = []
+        for player_data in team_data.players:
+            if player_data.name is not None:
+                # Create a new player
+                new_player = Player(name=player_data.name)
+                db.add(new_player)
+                await db.flush()
+                player_ids_to_use.append((new_player.id, player_data.role))
+            else:
+                # Use existing player ID
+                player_ids_to_use.append((player_data.player_id, player_data.role))
+        
+        # Create new team-player relationships
+        for player_id, role in player_ids_to_use:
+            team_player = TeamPlayer(
+                team_id=team.id,
+                player_id=player_id,
+                role=role,
+            )
+            db.add(team_player)
+    
     await db.commit()
-    await db.refresh(team, ["team_players", "team_players.player"])
+    
+    # Reload team with relationships for response
+    query = select(Team).where(Team.id == team.id).options(
+        selectinload(Team.team_players).selectinload(TeamPlayer.player)
+    )
+    result = await db.execute(query)
+    team = result.scalar_one()
     
     players = [
         TeamPlayerResponse(
@@ -241,6 +280,12 @@ async def delete_team(
     """
     Archive a team (soft delete).
     """
+    result = await db.execute(select(Team).where(Team.id == team_id))
+    team = result.scalar_one_or_none()
+
+    if not team:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Team not found")
+
     await archive_team(db, team_id)
     await db.commit()
 

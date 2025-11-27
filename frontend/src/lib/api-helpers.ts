@@ -93,3 +93,4 @@ export function transformStandings(apiStandings: ApiTeamStanding[]): TeamStandin
   return apiStandings.map(transformTeamStanding);
 }
 
+

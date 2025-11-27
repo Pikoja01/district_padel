@@ -128,6 +128,7 @@ export function useDeleteMatch() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "matches"] });
       queryClient.invalidateQueries({ queryKey: ["matches"] });
+      queryClient.invalidateQueries({ queryKey: ["standings"] });
       toast.success("Utakmica je uspešno otkazana");
     },
     onError: (error: any) => {

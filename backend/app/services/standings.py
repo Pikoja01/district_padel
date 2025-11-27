@@ -6,10 +6,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
 
-from app.models.team import Team, GroupEnum
-from app.models.match import Match, MatchStatusEnum, MatchSet
-from app.schemas.standings import TeamStandingResponse
 from uuid import UUID
+
+from app.models.team import Team, GroupEnum
+from app.models.match import Match, MatchStatusEnum
+from app.schemas.standings import TeamStandingResponse
+from app.services.match_service import count_sets_won
 
 
 def calculate_match_points(team_sets_won: int, opponent_sets_won: int) -> int:
@@ -100,15 +102,7 @@ async def calculate_standings(
             is_home = match.home_team_id == team.id
             
             # Calculate sets won for home and away
-            home_sets_won = 0
-            away_sets_won = 0
-            
-            for match_set in sorted(match.match_sets, key=lambda x: x.set_number):
-                if match_set.home_games > match_set.away_games:
-                    home_sets_won += 1
-                elif match_set.away_games > match_set.home_games:
-                    away_sets_won += 1
-            
+            home_sets_won, away_sets_won = count_sets_won(match.match_sets)
             team_sets_won = home_sets_won if is_home else away_sets_won
             opponent_sets_won = away_sets_won if is_home else home_sets_won
             
@@ -166,4 +160,5 @@ async def calculate_standings(
         standing.position = i + 1
     
     return standings
+
 

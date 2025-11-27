@@ -4,7 +4,7 @@ Admin dashboard endpoints
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
-from sqlalchemy.orm import selectinload
+
 
 from app.core.database import get_db
 from app.api.deps import get_current_user

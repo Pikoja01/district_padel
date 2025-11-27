@@ -32,3 +32,4 @@ class PlayerResponse(PlayerBase):
     class Config:
         from_attributes = True
 
+

@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy.exc import IntegrityError
 
 from app.core.database import get_db
 from app.api.deps import get_current_user
@@ -34,8 +35,15 @@ async def create_player(
         phone=player_data.phone,
     )
     db.add(player)
-    await db.commit()
-    await db.refresh(player)
+    try:
+        await db.commit()
+        await db.refresh(player)
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already in use",
+        )
     
     return PlayerResponse(
         id=player.id,

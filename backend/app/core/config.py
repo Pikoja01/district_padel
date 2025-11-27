@@ -2,6 +2,7 @@
 Application configuration management
 """
 from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from typing import List
 
 
@@ -11,6 +12,14 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
     DB_PASSWORD: str = "district_padel_dev"
+    
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def ensure_asyncpg_driver(cls, v: str) -> str:
+        """Ensure DATABASE_URL uses asyncpg driver for async SQLAlchemy"""
+        if isinstance(v, str) and v.startswith("postgresql://") and "+asyncpg" not in v:
+            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
     
     # Security
     SECRET_KEY: str
@@ -40,4 +49,5 @@ class Settings(BaseSettings):
 
 # Create global settings instance
 settings = Settings()
+
 

@@ -103,4 +103,9 @@ def downgrade() -> None:
     op.drop_table('teams')
     op.drop_index(op.f('ix_players_name'), table_name='players')
     op.drop_table('players')
+    
+    # Drop enum types
+    op.execute("DROP TYPE IF EXISTS matchstatusenum")
+    op.execute("DROP TYPE IF EXISTS groupenum")
+    op.execute("DROP TYPE IF EXISTS playerroleenum")
     # ### end Alembic commands ###

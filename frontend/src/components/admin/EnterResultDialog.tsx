@@ -94,12 +94,7 @@ export function EnterResultDialog({ matchId, open, onOpenChange }: EnterResultDi
   };
 
   const removeSet = (index: number) => {
-    // Allow removing sets, but keep at least 1 if there are no filled sets
-    const hasFilledSets = sets.some(
-      (s) => s.home_games !== null && s.away_games !== null && (s.home_games > 0 || s.away_games > 0)
-    );
-    
-    if (sets.length > 1 || !hasFilledSets) {
+    if (sets.length > 1) {
       const updated = sets.filter((_, i) => i !== index).map((s, i) => ({
         ...s,
         set_number: i + 1,

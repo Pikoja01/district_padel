@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from hmac import compare_digest
 
 from app.core.database import get_db
 from app.core.security import verify_password, create_access_token
@@ -14,6 +15,23 @@ from app.api.deps import get_current_user
 
 router = APIRouter()
 security = HTTPBearer()
+
+_GENERIC_AUTH_ERROR_DETAIL = "Incorrect username or password"
+# BCrypt hash for the string "unused-password" so timing stays consistent
+_DUMMY_PASSWORD_HASH = "$2b$12$CjPrwftYadeuXLh5uqGZrupY41aJDyqzsc2ZU9SKtKSf38hwOx5kG"
+
+
+def _constant_time_true(value: bool) -> bool:
+    """Compare boolean results in constant time to reduce timing leaks."""
+    return compare_digest(b"1" if value else b"0", b"1")
+
+
+def _auth_failure() -> HTTPException:
+    """Return a generic auth failure without leaking user state."""
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=_GENERIC_AUTH_ERROR_DETAIL,
+    )
 
 
 @router.post("/login", response_model=Token)
@@ -30,24 +48,14 @@ async def login(
     result = await db.execute(query)
     user = result.scalar_one_or_none()
     
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-        )
-    
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is inactive",
-        )
-    
-    # Verify password
-    if not verify_password(credentials.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-        )
+    # Always perform password verification to keep timing uniform
+    hashed_password = user.hashed_password if user else _DUMMY_PASSWORD_HASH
+    password_valid = _constant_time_true(
+        verify_password(credentials.password, hashed_password)
+    )
+
+    if not user or not user.is_active or not password_valid:
+        raise _auth_failure()
     
     # Create access token
     access_token = create_access_token(data={"sub": str(user.id), "username": user.username})

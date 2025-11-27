@@ -54,3 +54,4 @@ def validate_match_result(sets: List[MatchSetCreate]) -> None:
         if match_set.home_games < 0 or match_set.away_games < 0:
             raise ValueError("Games cannot be negative")
 
+

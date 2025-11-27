@@ -2,12 +2,29 @@
 Match service for processing match results
 """
 from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.models.match import Match, MatchSet, MatchStatusEnum
 from app.schemas.match import MatchResultCreate, MatchSetCreate
+
+
+def count_sets_won(match_sets: list[MatchSet]) -> tuple[int, int]:
+    """
+    Count how many sets the home and away teams have won.
+    """
+    home_sets_won = 0
+    away_sets_won = 0
+
+    for match_set in sorted(match_sets, key=lambda x: x.set_number):
+        if match_set.home_games > match_set.away_games:
+            home_sets_won += 1
+        elif match_set.away_games > match_set.home_games:
+            away_sets_won += 1
+
+    return home_sets_won, away_sets_won
 
 
 async def enter_match_result(
@@ -63,18 +80,9 @@ async def enter_match_result(
     await db.flush()
     await db.refresh(match, ["match_sets"])
     
-    # Count sets won by each team
-    home_sets_won = 0
-    away_sets_won = 0
-    
-    for match_set in sorted(match.match_sets, key=lambda x: x.set_number):
-        if match_set.home_games > match_set.away_games:
-            home_sets_won += 1
-        elif match_set.away_games > match_set.home_games:
-            away_sets_won += 1
-    
-    # Update match status: PLAYED if someone won 2 sets, otherwise IN_PROGRESS
-    if home_sets_won >= 2 or away_sets_won >= 2:
+    # Determine match status based on winner
+    winner_id = determine_match_winner(match)
+    if winner_id:
         match.status = MatchStatusEnum.PLAYED
     else:
         match.status = MatchStatusEnum.IN_PROGRESS
@@ -95,14 +103,7 @@ def determine_match_winner(match: Match) -> UUID | None:
     if not match.match_sets:
         return None
     
-    home_sets_won = 0
-    away_sets_won = 0
-    
-    for match_set in sorted(match.match_sets, key=lambda x: x.set_number):
-        if match_set.home_games > match_set.away_games:
-            home_sets_won += 1
-        elif match_set.away_games > match_set.home_games:
-            away_sets_won += 1
+    home_sets_won, away_sets_won = count_sets_won(match.match_sets)
     
     if home_sets_won > away_sets_won:
         return match.home_team_id

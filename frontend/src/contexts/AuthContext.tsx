@@ -1,7 +1,7 @@
 /**
  * Authentication context for managing admin login state
  */
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { adminApi, getAuthToken, removeAuthToken } from "@/lib/api";
 
 interface AuthContextType {
@@ -18,7 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     const token = getAuthToken();
     if (!token) {
       setIsAuthenticated(false);
@@ -32,12 +32,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       setIsAuthenticated(false);
       removeAuthToken();
+      throw new Error("Failed to verify authentication");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const login = async (username: string, password: string) => {
+    if (isLoading) {
+      throw new Error("Authentication operation already in progress");
+    }
     setIsLoading(true);
     try {
       await adminApi.login(username, password);
@@ -50,15 +54,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
-    adminApi.logout();
-    setIsAuthenticated(false);
-    // Navigation will be handled by components that use logout
+  const logout = async () => {
+    setIsLoading(true);
+    try {
+      await adminApi.logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsAuthenticated(false);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    checkAuth().catch((error) => {
+      console.error("Initial auth check failed:", error);
+      setIsAuthenticated(false);
+      setIsLoading(false);
+    });
+  }, [checkAuth]);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout, checkAuth }}>

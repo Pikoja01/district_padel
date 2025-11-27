@@ -80,6 +80,27 @@ class TeamUpdate(BaseModel):
     name: Optional[str] = None
     group: Optional[GroupEnum] = None
     active: Optional[bool] = None
+    players: Optional[List[TeamPlayerCreate]] = None
+
+    @field_validator("players")
+    @classmethod
+    def validate_players(cls, v: Optional[List[TeamPlayerCreate]]) -> Optional[List[TeamPlayerCreate]]:
+        if v is None:
+            return v
+        if len(v) < 2:
+            raise ValueError("Team must have at least 2 players")
+        if len(v) > 3:
+            raise ValueError("Team cannot have more than 3 players")
+        
+        main_players = [p for p in v if p.role == "main"]
+        reserve_players = [p for p in v if p.role == "reserve"]
+        
+        if len(main_players) < 2:
+            raise ValueError("Team must have at least 2 main players")
+        if len(reserve_players) > 1:
+            raise ValueError("Team cannot have more than 1 reserve player")
+        
+        return v
 
 
 class TeamPlayerResponse(BaseModel):

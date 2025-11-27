@@ -207,13 +207,12 @@ async def update_match(
     if match_data.away_team_id is not None:
         match.away_team_id = match_data.away_team_id
     
-    # Validate teams are different if both provided
-    if match_data.home_team_id and match_data.away_team_id:
-        if match.home_team_id == match.away_team_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Home team and away team must be different",
-            )
+    # Validate teams are different after any update
+    if match.home_team_id == match.away_team_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Home team and away team must be different",
+        )
     
     await db.commit()
     await db.refresh(match, ["home_team", "away_team", "match_sets"])

@@ -1,0 +1,50 @@
+services:
+  # Backend API Service
+  # NOTE: You must manually create a PostgreSQL database first, then add DATABASE_URL to env vars
+  - type: web
+    name: district-padel-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      # Database - MUST BE SET MANUALLY after creating PostgreSQL database
+      # Get Internal Database URL from your PostgreSQL service and add it here
+      # Format: postgresql+asyncpg://user:password@hostname:5432/database
+      - key: DATABASE_URL
+        sync: false  # Set manually after database creation
+      
+      # Security
+      - key: SECRET_KEY
+        generateValue: true  # Render will generate a secure key
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 1440
+        
+      # API
+      - key: API_V1_STR
+        value: /api/v1
+      - key: PROJECT_NAME
+        value: District Padel Backend
+        
+      # CORS - Frontend URLs (Vercel deployment)
+      - key: CORS_ORIGINS
+        value: https://district-padel.vercel.app,http://localhost:5173,http://localhost:8080
+        
+      # Environment
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+
+# NOTE: Database must be created manually in Render Dashboard
+# Steps:
+# 1. Go to Render Dashboard → New + → PostgreSQL
+# 2. Create database with name: district-padel-db
+# 3. Copy Internal Database URL
+# 4. Add to web service environment variables as DATABASE_URL
+# 5. Convert postgresql:// to postgresql+asyncpg:// in the URL
+

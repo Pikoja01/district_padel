@@ -13,26 +13,27 @@ from app.core.database import AsyncSessionLocal
 from app.models.user import User
 
 
-async def check_admin_user():
+async def check_admin_user(username: str = "admin"):
     """Check admin user details"""
     async with AsyncSessionLocal() as session:
-        # Find all admin users
-        query = select(User)
+        # Find the admin user by username (defaults to 'admin')
+        query = select(User).where(User.username == username)
         result = await session.execute(query)
-        users = result.scalars().all()
-        
-        if not users:
-            print("No users found!")
+        user = result.scalar_one_or_none()
+
+        if not user:
+            print(f"No admin user found for username '{username}'!")
             return
-        
-        for user in users:
-            print(f"Username: {user.username}")
-            print(f"Email: {user.email}")
-            print(f"Is Active: {user.is_active}")
-            print(f"ID: {user.id}")
-            print("-" * 50)
+
+        print(f"Username: {user.username}")
+        print(f"Email: {user.email}")
+        print(f"Is Active: {user.is_active}")
+        print(f"ID: {user.id}")
+        print("-" * 50)
 
 
 if __name__ == "__main__":
-    asyncio.run(check_admin_user())
+    username = sys.argv[1] if len(sys.argv) > 1 else "admin"
+    asyncio.run(check_admin_user(username))
+
 

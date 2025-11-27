@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
 import {
   Table,
@@ -15,6 +15,7 @@ import { SEOHead } from "@/components/layout/SEOHead";
 import { useStandings } from "@/hooks/use-standings";
 
 export default function LeagueGroupB() {
+  const navigate = useNavigate();
   const { data: standings = [], isLoading, error } = useStandings({ group: "B" });
 
   return (
@@ -95,12 +96,17 @@ export default function LeagueGroupB() {
                 </TableRow>
               ) : (
                 standings.map((standing) => (
-                  <TableRow key={standing.teamId} className="hover:bg-muted/50">
+                  <TableRow 
+                    key={standing.teamId} 
+                    className="hover:bg-muted/50 cursor-pointer"
+                    onClick={() => navigate(`/teams/${standing.teamId}`)}
+                  >
                     <TableCell className="font-bold">{standing.position}</TableCell>
                     <TableCell>
                       <Link
                         to={`/teams/${standing.teamId}`}
                         className="hover:text-primary transition-colors font-medium"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {standing.teamName}
                       </Link>

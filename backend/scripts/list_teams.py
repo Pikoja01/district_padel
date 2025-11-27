@@ -4,8 +4,7 @@ Script to list all teams
 import asyncio
 import httpx
 
-BASE_URL = "http://localhost:8000"
-USERNAME = "admin@test"
+BASE_URL = "http://localhost:8001"USERNAME = "admin@test"
 PASSWORD = "admin123"
 
 
@@ -53,4 +52,5 @@ async def list_teams():
 
 if __name__ == "__main__":
     asyncio.run(list_teams())
+
 

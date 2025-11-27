@@ -62,7 +62,12 @@ export function useUpdateTeam() {
       data,
     }: {
       teamId: string;
-      data: { name?: string; group?: "A" | "B"; active?: boolean };
+      data: { 
+        name?: string; 
+        group?: "A" | "B"; 
+        active?: boolean;
+        players?: Array<{ player_id?: string; name?: string; role: "main" | "reserve" }>;
+      };
     }) => {
       const apiTeam = await adminApi.updateTeam(teamId, data);
       return transformTeam(apiTeam);
@@ -118,4 +123,5 @@ export function useActivateTeam() {
     },
   });
 }
+
 
