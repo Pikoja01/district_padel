@@ -192,11 +192,8 @@ async def update_match(
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
     
-    if match.status == MatchStatusEnum.PLAYED:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot update a match that has been played",
-        )
+    # Allow updating played matches to fix errors
+    # Status will be recalculated based on sets won
     
     # Update fields
     if match_data.date is not None:
@@ -317,12 +314,7 @@ async def delete_match(
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
     
-    if match.status == MatchStatusEnum.PLAYED:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete a match that has been played",
-        )
-    
+    # Allow deletion of any match, including played ones
     await db.delete(match)
     await db.commit()
 

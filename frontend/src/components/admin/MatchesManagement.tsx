@@ -188,17 +188,15 @@ export function MatchesManagement() {
                           {match.status === "in_progress" ? "Ažuriraj rezultat" : "Unesi rezultat"}
                         </Button>
                       )}
-                      {match.status !== "played" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteClick(match.id)}
-                          disabled={deleteMatch.isPending}
-                          title="Obriši utakmicu"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(match.id)}
+                        disabled={deleteMatch.isPending}
+                        title="Obriši utakmicu"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
