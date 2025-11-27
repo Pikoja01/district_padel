@@ -28,7 +28,8 @@ class Settings(BaseSettings):
         """
         Validate DATABASE_URL format matches PostgreSQL connection string pattern.
         
-        Expected format: postgresql[+asyncpg]://user:password@host:port/database
+        Expected format: postgresql[+asyncpg]://user:password@host[:port]/database
+        Port is optional and defaults to 5432 if not provided.
         """
         if not isinstance(v, str) or not v.strip():
             raise ValueError(
@@ -37,19 +38,38 @@ class Settings(BaseSettings):
                 "See backend/docs/DEPLOYMENT.md for setup instructions."
             )
         
-        # Pattern for PostgreSQL URL: postgresql[+driver]://user:password@host:port/dbname
+        # Pattern for PostgreSQL URL: postgresql[+driver]://user:password@host[:port]/dbname
+        # Port is optional - if missing, we'll add :5432
         # Allows for special characters in password via URL encoding
-        postgresql_pattern = r'^postgresql(\+[a-zA-Z0-9]+)?://([^:]+):([^@]+)@([^:]+):(\d+)/([^?]+)(\?.*)?$'
+        postgresql_pattern_with_port = r'^postgresql(\+[a-zA-Z0-9]+)?://([^:]+):([^@]+)@([^:]+):(\d+)/([^?]+)(\?.*)?$'
+        postgresql_pattern_without_port = r'^postgresql(\+[a-zA-Z0-9]+)?://([^:]+):([^@]+)@([^/]+)/([^?]+)(\?.*)?$'
         
-        if not re.match(postgresql_pattern, v):
-            raise ValueError(
-                f"DATABASE_URL has invalid format. "
-                f"Expected format: postgresql[+asyncpg]://user:password@host:port/database\n"
-                f"Received: {v[:50]}... (truncated for security)\n"
-                f"See backend/docs/DEPLOYMENT.md for correct format and setup instructions."
-            )
+        # Check if URL matches pattern with port
+        if re.match(postgresql_pattern_with_port, v):
+            return v
         
-        return v
+        # Check if URL matches pattern without port - add default port 5432
+        match = re.match(postgresql_pattern_without_port, v)
+        if match:
+            # Reconstruct URL with port
+            driver = match.group(1) or ""
+            user = match.group(2)
+            password = match.group(3)
+            host = match.group(4)
+            database = match.group(5)
+            query = match.group(6) or ""
+            
+            # Reconstruct with port
+            url_with_port = f"postgresql{driver}://{user}:{password}@{host}:5432/{database}{query}"
+            return url_with_port
+        
+        # If neither pattern matches, raise error
+        raise ValueError(
+            f"DATABASE_URL has invalid format. "
+            f"Expected format: postgresql[+asyncpg]://user:password@host[:port]/database\n"
+            f"Received: {v[:50]}... (truncated for security)\n"
+            f"See backend/docs/DEPLOYMENT.md for correct format and setup instructions."
+        )
     
     # Security
     SECRET_KEY: str
