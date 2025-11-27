@@ -17,17 +17,20 @@ export default function TeamDetail() {
 
   const { data: team, isLoading: teamLoading, error: teamError } = useTeam(teamId);
   const { data: teamStanding, isLoading: standingLoading } = useTeamStanding(teamId);
-  const { data: allMatches = [], isLoading: matchesLoading } = useMatches({ status: "played" });
-  const { data: allTeams = [] } = useTeams();
+  const { data: allMatches = [], isLoading: matchesIsLoading, error: matchesError } = useMatches({ status: "played" });
+  const { data: allTeams = [], isLoading: teamsIsLoading, error: teamsError } = useTeams();
 
   const teamMatches = allMatches.filter(
     (m) => (m.homeTeamId === teamId || m.awayTeamId === teamId)
   );
 
   const getOpponentName = (match: Match) => {
+    if (teamsError) {
+      return "Greška pri učitavanju timova";
+    }
     const opponentId = match.homeTeamId === teamId ? match.awayTeamId : match.homeTeamId;
     const opponent = allTeams.find((t) => t.id === opponentId);
-    return opponent?.name || "Unknown";
+    return opponent?.name || "Nepoznat tim";
   };
 
   const getOpponentId = (match: Match) => {
@@ -41,18 +44,25 @@ export default function TeamDetail() {
     const teamSets = isHome ? match.homeSets : match.awaySets;
     const opponentSets = isHome ? match.awaySets : match.homeSets;
     
-    const teamSetsWon = teamSets.filter((s, i) => s > opponentSets[i]).length;
-    const opponentSetsWon = opponentSets.filter((s, i) => s > teamSets[i]).length;
+    const setsLength = Math.min(teamSets.length, opponentSets.length);
+    
+    let teamSetsWon = 0;
+    let opponentSetsWon = 0;
+    
+    for (let i = 0; i < setsLength; i++) {
+      if (teamSets[i] > opponentSets[i]) teamSetsWon++;
+      else if (opponentSets[i] > teamSets[i]) opponentSetsWon++;
+    }
     
     const isWin = teamSetsWon > opponentSetsWon;
     
     return {
-      formatted: teamSets.map((s, i) => `${s}:${opponentSets[i]}`).join(", "),
+      formatted: Array.from({ length: setsLength }, (_, i) => `${teamSets[i]}:${opponentSets[i]}`).join(", "),
       isWin,
     };
   };
 
-  const isLoading = teamLoading || standingLoading || matchesLoading;
+  const isLoading = teamLoading || standingLoading || matchesIsLoading || teamsIsLoading;
 
   if (isLoading) {
     return (
@@ -175,7 +185,14 @@ export default function TeamDetail() {
               <Trophy className="w-6 h-6 text-primary" />
               Nedavne utakmice
             </h2>
-            {teamMatches.length === 0 ? (
+            {matchesError ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Greška pri učitavanju utakmica. Molimo pokušajte ponovo.
+                </AlertDescription>
+              </Alert>
+            ) : teamMatches.length === 0 ? (
               <Card className="glass p-8 text-center text-muted-foreground">
                 Još nema odigranih utakmica
               </Card>
