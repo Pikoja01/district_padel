@@ -8,9 +8,8 @@ services:
   # For complete setup instructions, see: backend/docs/DEPLOYMENT.md
   - type: web
     name: district-padel-api
+    rootDir: backend
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
     plan: starter
     region: oregon
     healthCheckPath: /health
