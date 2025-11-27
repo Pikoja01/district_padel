@@ -36,17 +36,14 @@ export function calculateStandings(teams: Team[], matches: Match[]): TeamStandin
           matchesLost++;
         }
 
-        // Calculate points based on sets won
-        // Points system: Win 2-0 = 3pts, Win 2-1 = 2pts, Lose 1-2 = 1pt, Lose 0-2 = 0pts
         if (teamSetsWon === 2 && opponentSetsWon === 0) {
           points += 3; // Win 2-0
         } else if (teamSetsWon === 2 && opponentSetsWon === 1) {
           points += 2; // Win 2-1
         } else if (teamSetsWon === 1 && opponentSetsWon === 2) {
           points += 1; // Lose 1-2 (got 1 set)
-        } else if (teamSetsWon === 0 && opponentSetsWon === 2) {
-          points += 0; // Lose 0-2
         }
+        // Note: 0-2 losses automatically get 0 points (no action needed)
 
         const teamGamesFor = isHome
           ? match.homeSets.reduce((a, b) => a + b, 0)

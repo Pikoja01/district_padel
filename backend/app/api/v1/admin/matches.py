@@ -57,16 +57,17 @@ async def create_match(
         )
     
     # Create match
-    match = Match(
-        date=match_data.date,
-        group=match_data.group,
-        home_team_id=match_data.home_team_id,
-        away_team_id=match_data.away_team_id,
-        status=MatchStatusEnum.SCHEDULED,
-    )
-    db.add(match)
-    await db.commit()
-    await db.refresh(match, ["home_team", "away_team", "match_sets"])
+    async with db.begin():
+        match = Match(
+            date=match_data.date,
+            group=match_data.group,
+            home_team_id=match_data.home_team_id,
+            away_team_id=match_data.away_team_id,
+            status=MatchStatusEnum.SCHEDULED,
+        )
+        db.add(match)
+        await db.flush()
+        await db.refresh(match, ["home_team", "away_team", "match_sets"])
     
     return MatchResponse(
         id=match.id,
@@ -197,41 +198,42 @@ async def update_match(
             detail="Cannot update a match that has been played",
         )
     
-    # Update fields
-    if match_data.date is not None:
-        match.date = match_data.date
-    if match_data.group is not None:
-        match.group = match_data.group
-    if match_data.home_team_id is not None:
-        match.home_team_id = match_data.home_team_id
-    if match_data.away_team_id is not None:
-        match.away_team_id = match_data.away_team_id
-    
-    # Validate teams are different after any update
-    if match.home_team_id == match.away_team_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Home team and away team must be different",
-        )
-
-    # Re-validate team groups if group or teams changed
-    if match_data.group is not None or match_data.home_team_id is not None or match_data.away_team_id is not None:
-        home_result = await db.execute(select(Team).where(Team.id == match.home_team_id))
-        away_result = await db.execute(select(Team).where(Team.id == match.away_team_id))
-        home_team = home_result.scalar_one_or_none()
-        away_team = away_result.scalar_one_or_none()
+    async with db.begin():
+        # Update fields
+        if match_data.date is not None:
+            match.date = match_data.date
+        if match_data.group is not None:
+            match.group = match_data.group
+        if match_data.home_team_id is not None:
+            match.home_team_id = match_data.home_team_id
+        if match_data.away_team_id is not None:
+            match.away_team_id = match_data.away_team_id
         
-        if not home_team or not away_team:
-            raise HTTPException(status_code=404, detail="Team not found")
-        
-        if home_team.group != match.group or away_team.group != match.group:
+        # Validate teams are different after any update
+        if match.home_team_id == match.away_team_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Both teams must be in the same group as the match",
+                detail="Home team and away team must be different",
             )
-    
-    await db.commit()
-    await db.refresh(match, ["home_team", "away_team", "match_sets"])
+
+        # Re-validate team groups if group or teams changed
+        if match_data.group is not None or match_data.home_team_id is not None or match_data.away_team_id is not None:
+            home_result = await db.execute(select(Team).where(Team.id == match.home_team_id))
+            away_result = await db.execute(select(Team).where(Team.id == match.away_team_id))
+            home_team = home_result.scalar_one_or_none()
+            away_team = away_result.scalar_one_or_none()
+            
+            if not home_team or not away_team:
+                raise HTTPException(status_code=404, detail="Team not found")
+            
+            if home_team.group != match.group or away_team.group != match.group:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Both teams must be in the same group as the match",
+                )
+        
+        await db.flush()
+        await db.refresh(match, ["home_team", "away_team", "match_sets"])
     
     match_sets = [
         MatchSetResponse(
@@ -267,9 +269,10 @@ async def enter_match_result_endpoint(
     Enter match result after the match has been played.
     """
     try:
-        match = await enter_match_result(db, match_id, result)
-        await db.commit()
-        await db.refresh(match, ["home_team", "away_team", "match_sets"])
+        async with db.begin():
+            match = await enter_match_result(db, match_id, result)
+            await db.flush()
+            await db.refresh(match, ["home_team", "away_team", "match_sets"])
         
         match_sets = [
             MatchSetResponse(
@@ -293,8 +296,7 @@ async def enter_match_result_endpoint(
             away_team_name=match.away_team.name if match.away_team else None,
         )
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 @router.delete("/{match_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_match(
@@ -319,6 +321,6 @@ async def delete_match(
             detail="Cannot delete a match that has been played",
         )
     
-    await db.delete(match)
-    await db.commit()
+    async with db.begin():
+        await db.delete(match)
 

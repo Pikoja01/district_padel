@@ -29,8 +29,8 @@ export default function Admin() {
     setSearchParams({ tab: value });
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/admin/login");
   };
 

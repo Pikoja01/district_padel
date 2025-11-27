@@ -39,6 +39,15 @@ services:
         value: production
       - key: DEBUG
         value: false
+      
+      # Admin User (created automatically on first startup)
+      # Change these values to set custom admin credentials
+      - key: ADMIN_USERNAME
+        value: admin@test.com
+      - key: ADMIN_PASSWORD
+        value: admin123
+      - key: ADMIN_EMAIL
+        value: admin@test.com
 
 # NOTE: Database must be created manually in Render Dashboard
 # Steps:

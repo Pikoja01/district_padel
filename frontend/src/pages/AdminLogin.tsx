@@ -48,6 +48,8 @@ export default function AdminLogin() {
       <SEOHead
         title="Admin Login - District Padel"
         description="Administratorska prijava za District Padel League"
+        keywords="admin login, district padel admin, administratorska prijava"
+        canonicalUrl="https://districtpadel.rs/admin/login"
       />
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -74,8 +76,7 @@ export default function AdminLogin() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin@test"
-                  required
+                  placeholder="Korisničko ime"                  required
                   disabled={isLoading}
                   autoComplete="username"
                 />

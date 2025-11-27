@@ -29,21 +29,21 @@ async def create_player(
     """
     Create a new player.
     """
-    player = Player(
-        name=player_data.name,
-        email=player_data.email,
-        phone=player_data.phone,
-    )
-    db.add(player)
-    try:
-        await db.commit()
-        await db.refresh(player)
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already in use",
+    async with db.begin():
+        player = Player(
+            name=player_data.name,
+            email=player_data.email,
+            phone=player_data.phone,
         )
+        db.add(player)
+        try:
+            await db.flush()
+            await db.refresh(player)
+        except IntegrityError:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Email already in use",
+            ) from None
     
     return PlayerResponse(
         id=player.id,
@@ -110,23 +110,30 @@ async def update_player(
     """
     Update player information.
     """
-    query = select(Player).where(Player.id == player_id)
-    result = await db.execute(query)
-    player = result.scalar_one_or_none()
-    
-    if not player:
-        raise HTTPException(status_code=404, detail="Player not found")
-    
-    # Update fields
-    if player_data.name is not None:
-        player.name = player_data.name
-    if player_data.email is not None:
-        player.email = player_data.email
-    if player_data.phone is not None:
-        player.phone = player_data.phone
-    
-    await db.commit()
-    await db.refresh(player)
+    async with db.begin():
+        query = select(Player).where(Player.id == player_id)
+        result = await db.execute(query)
+        player = result.scalar_one_or_none()
+        
+        if not player:
+            raise HTTPException(status_code=404, detail="Player not found")
+        
+        # Update fields
+        if player_data.name is not None:
+            player.name = player_data.name
+        if player_data.email is not None:
+            player.email = player_data.email
+        if player_data.phone is not None:
+            player.phone = player_data.phone
+        
+        try:
+            await db.flush()
+            await db.refresh(player)
+        except IntegrityError:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Email already in use",
+            ) from None
     
     return PlayerResponse(
         id=player.id,

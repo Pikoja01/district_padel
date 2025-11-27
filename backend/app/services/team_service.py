@@ -38,6 +38,10 @@ async def validate_team_creation(
     # Check all player IDs exist (only for players that have player_id)
     player_ids = [p.player_id for p in players if p.player_id is not None]
     if player_ids:
+        # Check for duplicate player IDs in the same team first
+        if len(player_ids) != len(set(player_ids)):
+            raise ValueError("Duplicate player IDs in team")
+        
         from app.models.player import Player
         query = select(Player).where(Player.id.in_(player_ids))
         result = await db.execute(query)
@@ -47,10 +51,6 @@ async def validate_team_creation(
         missing_ids = set(player_ids) - existing_ids
         if missing_ids:
             raise ValueError(f"Players not found: {missing_ids}")
-        
-        # Check for duplicate player IDs in the same team
-        if len(player_ids) != len(set(player_ids)):
-            raise ValueError("Duplicate player IDs in team")
 
 
 async def archive_team(

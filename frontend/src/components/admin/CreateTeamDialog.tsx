@@ -70,12 +70,6 @@ export function CreateTeamDialog({ open, onOpenChange }: CreateTeamDialogProps) 
       return;
     }
 
-    const mainPlayers = players.filter((p) => p.role === "main");
-    if (mainPlayers.length < 2) {
-      alert("Tim mora imati najmanje 2 glavna igrača");
-      return;
-    }
-
     const playersToSubmit = players
       .filter((p) => p.name.trim())
       .map((p) => ({
@@ -83,11 +77,16 @@ export function CreateTeamDialog({ open, onOpenChange }: CreateTeamDialogProps) 
         role: p.role,
       }));
 
+    const mainPlayersCount = playersToSubmit.filter((p) => p.role === "main").length;
+    if (mainPlayersCount < 2) {
+      alert("Tim mora imati najmanje 2 glavna igrača sa imenima");
+      return;
+    }
+
     if (playersToSubmit.length < 2 || playersToSubmit.length > 3) {
       alert("Tim mora imati 2-3 igrača");
       return;
     }
-
     try {
       await createTeam.mutateAsync({
         name: teamName.trim(),
@@ -103,9 +102,9 @@ export function CreateTeamDialog({ open, onOpenChange }: CreateTeamDialogProps) 
       ]);
       onOpenChange(false);
     } catch (error) {
-      // Error handled by mutation
-    }
-  };
+      // Mutation's onError should handle this, but log as fallback
+      console.error("Failed to create team:", error);
+    }  };
 
   const mainPlayersCount = players.filter((p) => p.role === "main").length;
   const reservePlayersCount = players.filter((p) => p.role === "reserve").length;

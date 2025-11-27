@@ -32,7 +32,7 @@ async def update_admin_email():
         await session.commit()
         await session.refresh(user)
         
-        print(f"Successfully updated admin user:")
+        print("Successfully updated admin user:")
         print(f"Username: {user.username}")
         print(f"Email: {user.email}")
         print(f"Is Active: {user.is_active}")

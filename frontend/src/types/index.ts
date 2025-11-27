@@ -43,3 +43,17 @@ export type TeamStanding = {
   gameDiff: number;
   position: number;
 };
+
+export type DashboardStats = {
+  teams: {
+    active: number;
+    total: number;
+    group_a: number;
+    group_b: number;
+  };
+  matches: {
+    scheduled: number;
+    played: number;
+    total: number;
+  };
+};

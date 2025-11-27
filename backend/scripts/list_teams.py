@@ -2,11 +2,18 @@
 Script to list all teams
 """
 import asyncio
+import os
+
 import httpx
 
-BASE_URL = "http://localhost:8001"
-USERNAME = "admin@test"
-PASSWORD = "admin123"
+# Defaults support local dev; override via env vars or .env file.
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local").lower()
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8001")
+USERNAME = os.getenv("USERNAME", "admin@test")
+PASSWORD = os.getenv("PASSWORD", "admin123")
+
+if ENVIRONMENT != "local" and (not USERNAME or not PASSWORD):
+    raise RuntimeError("USERNAME and PASSWORD env vars are required outside local environments.")
 
 
 async def list_teams():
@@ -24,7 +31,12 @@ async def list_teams():
             print(f"❌ Login failed: {login_response.status_code}")
             return
         
-        token = login_response.json()["access_token"]
+        try:
+            token = login_response.json()["access_token"]
+        except (KeyError, ValueError) as e:
+            print(f"❌ Failed to extract access token: {e}")
+            return
+
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json"

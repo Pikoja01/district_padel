@@ -34,15 +34,23 @@ async def get_db() -> AsyncSession:
     """
     Dependency function to get database session.
     Use this in FastAPI route dependencies.
+    
+    IMPORTANT: This dependency does NOT automatically commit or rollback transactions.
+    Route handlers must use explicit transaction boundaries for write operations:
+    
+    For write operations (INSERT, UPDATE, DELETE):
+        async with db.begin():
+            # Your database operations here
+            db.add(object)
+            # Transaction commits automatically on successful exit
+    
+    For read-only operations:
+        # No transaction needed, just use the session directly
+        result = await db.execute(query)
+    
+    This pattern ensures deterministic transaction boundaries and follows SQLAlchemy
+    async best practices.
     """
     async with AsyncSessionLocal() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
-
+        yield session
 

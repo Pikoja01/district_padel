@@ -18,8 +18,7 @@ import {
 
 export function DashboardOverview() {
   const { data: stats, isLoading: statsLoading, error: statsError } = useDashboardStats();
-  const { data: standings = [], isLoading: standingsLoading } = useStandings();
-
+  const { data: standings = [], isLoading: standingsLoading, error: standingsError } = useStandings();
   if (statsError) {
     return (
       <Alert variant="destructive">

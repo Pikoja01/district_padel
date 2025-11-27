@@ -93,7 +93,7 @@ export function EditTeamDialog({ teamId, open, onOpenChange }: EditTeamDialogPro
       return;
     }
 
-    const mainPlayers = players.filter((p) => p.role === "main");
+    const mainPlayers = players.filter((p) => p.role === "main" && p.name.trim());
     if (mainPlayers.length < 2) {
       alert("Tim mora imati najmanje 2 glavna igrača");
       return;
@@ -110,7 +110,6 @@ export function EditTeamDialog({ teamId, open, onOpenChange }: EditTeamDialogPro
       alert("Tim mora imati 2-3 igrača");
       return;
     }
-
     try {
       await updateTeam.mutateAsync({
         teamId,

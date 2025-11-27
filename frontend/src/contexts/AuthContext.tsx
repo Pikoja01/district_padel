@@ -8,7 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
 
@@ -32,16 +32,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       setIsAuthenticated(false);
       removeAuthToken();
-      throw new Error("Failed to verify authentication");
+      return;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const login = async (username: string, password: string) => {
-    if (isLoading) {
-      throw new Error("Authentication operation already in progress");
-    }
     setIsLoading(true);
     try {
       await adminApi.login(username, password);
@@ -69,8 +66,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     checkAuth().catch((error) => {
       console.error("Initial auth check failed:", error);
-      setIsAuthenticated(false);
-      setIsLoading(false);
     });
   }, [checkAuth]);
 

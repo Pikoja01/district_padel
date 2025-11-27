@@ -10,11 +10,10 @@ psycopg2-binary==2.9.9  # For Alembic migrations (sync)
 alembic==1.13.1
 
 # Authentication & Security
-python-jose[cryptography]==3.5.0
+PyJWT==2.9.0
+cryptography==42.0.7  # Required by PyJWT for cryptographic operations
 passlib[bcrypt]==1.7.4
 python-dotenv==1.0.0
-# Prefer pyca/cryptography over ecdsa for ECDSA operations
-cryptography==42.0.7
 
 # Validation
 pydantic==2.5.3

@@ -49,16 +49,17 @@ async def create_admin_user(username: str, email: str, password: str):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 4:
-        print("Usage: python scripts/create_admin.py <username> <email> <password>")
+    if len(sys.argv) < 3:
+        print("Usage: python scripts/create_admin.py <username> <email>")
         print("\nExample:")
-        print("  python scripts/create_admin.py admin admin@districtpadel.rs admin123")
+        print("  python scripts/create_admin.py admin admin@districtpadel.rs")
         sys.exit(1)
     
     username = sys.argv[1]
     email = sys.argv[2]
-    password = sys.argv[3]
+    
+    from getpass import getpass
+    password = getpass("Enter password: ")
     
     asyncio.run(create_admin_user(username, email, password))
-
 

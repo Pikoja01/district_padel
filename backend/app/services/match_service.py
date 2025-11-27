@@ -57,15 +57,14 @@ async def enter_match_result(
     if match.status not in [MatchStatusEnum.SCHEDULED, MatchStatusEnum.IN_PROGRESS]:
         raise ValueError(f"Match {match_id} cannot be updated (status: {match.status})")
     
-    # Delete existing sets if any
-    for existing_set in match.match_sets:
-        await db.delete(existing_set)
-    
     # Validate that no sets have empty/zero scores for both teams
     for set_data in result.sets:
         if set_data.home_games == 0 and set_data.away_games == 0:
             raise ValueError(f"Set {set_data.set_number} cannot have both scores as 0")
     
+    # Delete existing sets if any
+    for existing_set in match.match_sets:
+        await db.delete(existing_set)    
     # Create new match sets
     for set_data in result.sets:
         match_set = MatchSet(

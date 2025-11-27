@@ -25,7 +25,7 @@ target_metadata = Base.metadata
 
 # Override sqlalchemy.url with our DATABASE_URL from settings
 # Convert asyncpg URL to psycopg2 for Alembic (sync migrations)
-db_url = settings.DATABASE_URL.replace("+asyncpg", "").replace("postgresql+asyncpg://", "postgresql+psycopg2://")
+db_url = settings.DATABASE_URL.replace("postgresql+asyncpg://", "postgresql+psycopg2://")
 config.set_main_option("sqlalchemy.url", db_url)
 
 

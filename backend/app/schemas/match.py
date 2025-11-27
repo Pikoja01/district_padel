@@ -29,11 +29,7 @@ class MatchSetCreate(BaseModel):
             raise ValueError("Games cannot be negative")
         return v
     
-    @classmethod
-    def validate_set_complete(cls, home_games: int, away_games: int) -> None:
-        """Validate that a set has at least one non-zero score"""
-        if home_games == 0 and away_games == 0:
-            raise ValueError("A set cannot have both scores as 0")
+
 
 
 class MatchBase(BaseModel):

@@ -12,12 +12,38 @@ from app.core.database import get_db
 from app.api.deps import get_current_user
 from app.models.user import User
 from app.models.team import Team
-from app.models.team_player import TeamPlayer
+from app.models.team_player import TeamPlayer, PlayerRoleEnum
 from app.models.player import Player
 from app.schemas.team import TeamCreate, TeamUpdate, TeamResponse, TeamPlayerCreate, TeamPlayerResponse
 from app.services.team_service import validate_team_creation, archive_team, activate_team
 
 router = APIRouter()
+
+
+async def _process_team_players(
+    db: AsyncSession,
+    player_data_list: List[TeamPlayerCreate]
+) -> List[tuple[UUID, PlayerRoleEnum]]:
+    """
+    Process team players: convert role strings to enums, create new players if needed,
+    or use existing player IDs. Returns a list of (player_id, role_enum) tuples.
+    """
+    player_ids_to_use = []
+    for player_data in player_data_list:
+        # Convert role string to enum
+        role_enum = PlayerRoleEnum.MAIN if player_data.role.lower() == "main" else PlayerRoleEnum.RESERVE
+        
+        if player_data.name is not None:
+            # Create a new player
+            new_player = Player(name=player_data.name)
+            db.add(new_player)
+            await db.flush()
+            player_ids_to_use.append((new_player.id, role_enum))
+        else:
+            # Use existing player ID
+            player_ids_to_use.append((player_data.player_id, role_enum))
+    
+    return player_ids_to_use
 
 
 @router.post("/", response_model=TeamResponse, status_code=status.HTTP_201_CREATED)
@@ -52,17 +78,7 @@ async def create_team(
     await db.flush()
     
     # Process players - create new ones if needed, or use existing IDs
-    player_ids_to_use = []
-    for player_data in team_data.players:
-        if player_data.name is not None:
-            # Create a new player
-            new_player = Player(name=player_data.name)
-            db.add(new_player)
-            await db.flush()
-            player_ids_to_use.append((new_player.id, player_data.role))
-        else:
-            # Use existing player ID
-            player_ids_to_use.append((player_data.player_id, player_data.role))
+    player_ids_to_use = await _process_team_players(db, team_data.players)
     
     # Create team-player relationships
     for player_id, role in player_ids_to_use:
@@ -86,7 +102,7 @@ async def create_team(
         TeamPlayerResponse(
             id=tp.player.id,
             name=tp.player.name,
-            role=tp.role.value
+            role=tp.role.value.lower()  # Convert "MAIN"/"RESERVE" to "main"/"reserve"
         )
         for tp in team.team_players
     ]
@@ -121,7 +137,7 @@ async def list_teams(
             TeamPlayerResponse(
                 id=tp.player.id,
                 name=tp.player.name,
-                role=tp.role.value
+                role=tp.role.value.lower()  # Convert "MAIN"/"RESERVE" to "main"/"reserve"
             )
             for tp in team.team_players
         ]
@@ -160,7 +176,7 @@ async def get_team(
         TeamPlayerResponse(
             id=tp.player.id,
             name=tp.player.name,
-            role=tp.role.value
+            role=tp.role.value.lower()  # Convert "MAIN"/"RESERVE" to "main"/"reserve"
         )
         for tp in team.team_players
     ]
@@ -221,19 +237,10 @@ async def update_team(
         await db.execute(
             delete(TeamPlayer).where(TeamPlayer.team_id == team_id)
         )
+        await db.flush()
         
         # Process new players - create new ones if needed, or use existing IDs
-        player_ids_to_use = []
-        for player_data in team_data.players:
-            if player_data.name is not None:
-                # Create a new player
-                new_player = Player(name=player_data.name)
-                db.add(new_player)
-                await db.flush()
-                player_ids_to_use.append((new_player.id, player_data.role))
-            else:
-                # Use existing player ID
-                player_ids_to_use.append((player_data.player_id, player_data.role))
+        player_ids_to_use = await _process_team_players(db, team_data.players)
         
         # Create new team-player relationships
         for player_id, role in player_ids_to_use:
@@ -257,7 +264,7 @@ async def update_team(
         TeamPlayerResponse(
             id=tp.player.id,
             name=tp.player.name,
-            role=tp.role.value
+            role=tp.role.value.lower()  # Convert "MAIN"/"RESERVE" to "main"/"reserve"
         )
         for tp in team.team_players
     ]
@@ -300,14 +307,15 @@ async def activate_team_endpoint(
     Reactivate an archived team.
     """
     team = await activate_team(db, team_id)
-    await db.commit()
+    await db.flush()
     await db.refresh(team, ["team_players", "team_players.player"])
+    await db.commit()
     
     players = [
         TeamPlayerResponse(
             id=tp.player.id,
             name=tp.player.name,
-            role=tp.role.value
+            role=tp.role.value.lower()  # Convert "MAIN"/"RESERVE" to "main"/"reserve"
         )
         for tp in team.team_players
     ]

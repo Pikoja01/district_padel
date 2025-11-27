@@ -1,6 +1,7 @@
 /**
  * API Client for District Padel Backend
  */
+import type { DashboardStats } from "@/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001";
 
@@ -328,8 +329,8 @@ export const adminApi = {
   },
 
   // Dashboard
-  getDashboardStats: async () => {
-    return apiRequest("/api/v1/admin/dashboard/stats");
+  getDashboardStats: async (): Promise<DashboardStats> => {
+    return apiRequest<DashboardStats>("/api/v1/admin/dashboard/stats");
   },
 };
 

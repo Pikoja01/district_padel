@@ -32,20 +32,44 @@ class Settings(BaseSettings):
     
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173"
+    CORS_ALLOW_METHODS: str = "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+    CORS_ALLOW_HEADERS: str = "Authorization,Content-Type"
+    CORS_EXPOSE_HEADERS: str = ""
     
     # Environment
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     
+    def _csv_to_list(self, value: str) -> List[str]:
+        """Convert comma-separated environment values into trimmed lists"""
+        if not value:
+            return []
+        return [item.strip() for item in value.split(",") if item.strip()]
+
     @property
     def cors_origins_list(self) -> List[str]:
         """Parse CORS origins from comma-separated string"""
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+        return self._csv_to_list(self.CORS_ORIGINS)
 
+    @property
+    def cors_allow_methods_list(self) -> List[str]:
+        """HTTP methods allowed by CORS"""
+        return self._csv_to_list(self.CORS_ALLOW_METHODS)
+
+    @property
+    def cors_allow_headers_list(self) -> List[str]:
+        """Headers accepted by CORS"""
+        return self._csv_to_list(self.CORS_ALLOW_HEADERS)
+
+    @property
+    def cors_expose_headers_list(self) -> List[str]:
+        """Headers exposed to the browser"""
+        return self._csv_to_list(self.CORS_EXPOSE_HEADERS)
+    
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": True,
+    }
 
 # Create global settings instance
 settings = Settings()

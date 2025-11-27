@@ -120,11 +120,12 @@ async def create_matches_and_results():
                     day_offset += 1
                     existing_match_keys.add(match_key)
                     return match_info["id"]
+                else:
+                    print(f"      ❌ Failed to enter result: {result_response.status_code} - {result_response.text}")
             else:
                 if response.status_code != 400 or "already exists" not in response.text.lower():
                     print(f"      ❌ Failed: {response.status_code} - {response.text}")
-            return None
-        
+            return None        
         # Group A matches - create all combinations (3 teams = 6 matches)
         print("⚽ Creating Group A matches...")
         if len(group_a_teams) >= 3:
