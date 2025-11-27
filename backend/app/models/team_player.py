@@ -12,8 +12,8 @@ from app.core.database import Base
 
 class PlayerRoleEnum(str, enum.Enum):
     """Player role enumeration"""
-    MAIN = "main"
-    RESERVE = "reserve"
+    MAIN = "MAIN"
+    RESERVE = "RESERVE"
 
 
 class TeamPlayer(Base):
