@@ -15,6 +15,7 @@ from app.models.match import Match, MatchStatusEnum
 from app.models.team import Team, GroupEnum
 from app.schemas.match import MatchCreate, MatchUpdate, MatchResponse, MatchResultCreate, MatchSetResponse
 from app.services.match_service import enter_match_result
+from app.exceptions import NotFoundError
 
 router = APIRouter()
 
@@ -269,10 +270,9 @@ async def enter_match_result_endpoint(
     Enter match result after the match has been played.
     """
     try:
-        async with db.begin():
-            match = await enter_match_result(db, match_id, result)
-            await db.flush()
-            await db.refresh(match, ["home_team", "away_team", "match_sets"])
+        match = await enter_match_result(db, match_id, result)
+        await db.commit()
+        await db.refresh(match, ["home_team", "away_team", "match_sets"])
         
         match_sets = [
             MatchSetResponse(
@@ -295,7 +295,11 @@ async def enter_match_result_endpoint(
             home_team_name=match.home_team.name if match.home_team else None,
             away_team_name=match.away_team.name if match.away_team else None,
         )
+    except NotFoundError as e:
+        await db.rollback()
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except ValueError as e:
+        await db.rollback()
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 @router.delete("/{match_id}", status_code=status.HTTP_204_NO_CONTENT)

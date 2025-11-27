@@ -54,7 +54,7 @@ async def list_teams(
             players.append(TeamPlayerResponse(
                 id=team_player.player.id,
                 name=team_player.player.name,
-                role=team_player.role.value
+                role=team_player.role.value.lower()  # Convert "MAIN"/"RESERVE" to "main"/"reserve"
             ))
         
         team_responses.append(TeamResponse(
@@ -92,7 +92,7 @@ async def get_team(
         players.append(TeamPlayerResponse(
             id=team_player.player.id,
             name=team_player.player.name,
-            role=team_player.role.value
+            role=team_player.role.value.lower()  # Convert "MAIN"/"RESERVE" to "main"/"reserve"
         ))
     
     return TeamResponse(

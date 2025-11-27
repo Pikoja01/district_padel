@@ -4,11 +4,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { publicApi } from "@/lib/api";
 import { transformMatches, transformMatch } from "@/lib/api-helpers";
-import type { Match } from "@/types";
+import type { Match, MatchStatus } from "@/types";
 
 export function useMatches(params?: {
   group?: "A" | "B";
-  status?: "scheduled" | "played";
+  status?: MatchStatus;
   date_from?: string;
   date_to?: string;
 }) {

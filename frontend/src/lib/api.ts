@@ -167,7 +167,7 @@ export const publicApi = {
   // Get all matches
   getMatches: async (params?: {
     group?: "A" | "B";
-    status?: "scheduled" | "played";
+    status?: "scheduled" | "in_progress" | "played" | "cancelled";
     date_from?: string;
     date_to?: string;
   }): Promise<ApiMatch[]> => {

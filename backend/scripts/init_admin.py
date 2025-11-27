@@ -19,11 +19,29 @@ from app.core.security import get_password_hash
 
 
 async def init_admin_user():
-    """Create admin user if it doesn't exist"""
+    """
+    Create admin user if it doesn't exist.
+    
+    Requires ADMIN_USERNAME, ADMIN_PASSWORD, and ADMIN_EMAIL environment variables.
+    If any are missing, admin creation is skipped (admin can be created manually).
+    """
     # Get admin credentials from environment variables
-    admin_username = os.getenv("ADMIN_USERNAME", "admin@test.com")
-    admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
-    admin_email = os.getenv("ADMIN_EMAIL", admin_username)
+    # No defaults - if not set, admin creation is skipped
+    admin_username = os.getenv("ADMIN_USERNAME")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+    admin_email = os.getenv("ADMIN_EMAIL")
+    
+    # Check if all required variables are set
+    if not admin_username or not admin_password:
+        print("ℹ️  ADMIN_USERNAME and ADMIN_PASSWORD not set. Skipping automatic admin creation.")
+        print("   Admin user can be created manually using: python scripts/create_admin.py")
+        print("   Or set ADMIN_USERNAME, ADMIN_PASSWORD, and ADMIN_EMAIL environment variables.")
+        return
+    
+    # Use username as email if email not provided
+    if not admin_email:
+        admin_email = admin_username
+        print(f"ℹ️  ADMIN_EMAIL not set, using ADMIN_USERNAME ({admin_email}) as email.")
     
     # Create database engine
     engine = create_async_engine(settings.DATABASE_URL, echo=False)

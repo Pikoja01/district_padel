@@ -30,8 +30,17 @@ async def _process_team_players(
     """
     player_ids_to_use = []
     for player_data in player_data_list:
-        # Convert role string to enum
-        role_enum = PlayerRoleEnum.MAIN if player_data.role.lower() == "main" else PlayerRoleEnum.RESERVE
+        # Convert role string to enum with explicit validation
+        role_str = player_data.role.lower()
+        if role_str == "main":
+            role_enum = PlayerRoleEnum.MAIN
+        elif role_str == "reserve":
+            role_enum = PlayerRoleEnum.RESERVE
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid player role: {player_data.role}"
+            )
         
         if player_data.name is not None:
             # Create a new player

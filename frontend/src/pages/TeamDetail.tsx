@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Trophy, Users, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,6 +28,10 @@ export default function TeamDetail() {
     const opponentId = match.homeTeamId === teamId ? match.awayTeamId : match.homeTeamId;
     const opponent = allTeams.find((t) => t.id === opponentId);
     return opponent?.name || "Unknown";
+  };
+
+  const getOpponentId = (match: Match) => {
+    return match.homeTeamId === teamId ? match.awayTeamId : match.homeTeamId;
   };
 
   const getResult = (match: Match) => {
@@ -184,7 +188,15 @@ export default function TeamDetail() {
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex-1">
                           <div className="text-sm text-muted-foreground mb-1">{match.date}</div>
-                          <div className="font-semibold">vs {getOpponentName(match)}</div>
+                          <div className="font-semibold">
+                            vs{" "}
+                            <Link
+                              to={`/teams/${getOpponentId(match)}`}
+                              className="text-primary hover:underline transition-colors"
+                            >
+                              {getOpponentName(match)}
+                            </Link>
+                          </div>
                         </div>
                         <div className="text-right">
                           <div className="font-mono text-lg mb-1">{result.formatted}</div>

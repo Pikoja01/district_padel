@@ -4,6 +4,7 @@ Application configuration management
 from pydantic_settings import BaseSettings
 from pydantic import field_validator
 from typing import List
+import re
 
 
 class Settings(BaseSettings):
@@ -11,7 +12,7 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: str
-    DB_PASSWORD: str = "district_padel_dev"
+    DB_PASSWORD: str  # Required: must be provided via environment variable or .env file
     
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
@@ -19,6 +20,35 @@ class Settings(BaseSettings):
         """Ensure DATABASE_URL uses asyncpg driver for async SQLAlchemy"""
         if isinstance(v, str) and v.startswith("postgresql://") and "+asyncpg" not in v:
             return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
+    
+    @field_validator("DATABASE_URL", mode="after")
+    @classmethod
+    def validate_database_url_format(cls, v: str) -> str:
+        """
+        Validate DATABASE_URL format matches PostgreSQL connection string pattern.
+        
+        Expected format: postgresql[+asyncpg]://user:password@host:port/database
+        """
+        if not isinstance(v, str) or not v.strip():
+            raise ValueError(
+                "DATABASE_URL is missing or empty. "
+                "Please set DATABASE_URL environment variable. "
+                "See backend/docs/DEPLOYMENT.md for setup instructions."
+            )
+        
+        # Pattern for PostgreSQL URL: postgresql[+driver]://user:password@host:port/dbname
+        # Allows for special characters in password via URL encoding
+        postgresql_pattern = r'^postgresql(\+[a-zA-Z0-9]+)?://([^:]+):([^@]+)@([^:]+):(\d+)/([^?]+)(\?.*)?$'
+        
+        if not re.match(postgresql_pattern, v):
+            raise ValueError(
+                f"DATABASE_URL has invalid format. "
+                f"Expected format: postgresql[+asyncpg]://user:password@host:port/database\n"
+                f"Received: {v[:50]}... (truncated for security)\n"
+                f"See backend/docs/DEPLOYMENT.md for correct format and setup instructions."
+            )
+        
         return v
     
     # Security

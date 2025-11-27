@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 
 from app.models.match import Match, MatchSet, MatchStatusEnum
 from app.schemas.match import MatchResultCreate, MatchSetCreate
+from app.exceptions import NotFoundError
 
 
 def count_sets_won(match_sets: list[MatchSet]) -> tuple[int, int]:
@@ -51,7 +52,7 @@ async def enter_match_result(
     match = result_query.scalar_one_or_none()
     
     if not match:
-        raise ValueError(f"Match {match_id} not found")
+        raise NotFoundError(f"Match {match_id} not found")
     
     # Allow updating results if match is scheduled or in progress
     if match.status not in [MatchStatusEnum.SCHEDULED, MatchStatusEnum.IN_PROGRESS]:

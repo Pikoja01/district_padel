@@ -40,11 +40,23 @@ async def get_dashboard_stats(
     scheduled_result = await db.execute(scheduled_matches_query)
     scheduled_count = scheduled_result.scalar_one()
     
+    in_progress_matches_query = select(func.count(Match.id)).where(
+        Match.status == MatchStatusEnum.IN_PROGRESS
+    )
+    in_progress_result = await db.execute(in_progress_matches_query)
+    in_progress_count = in_progress_result.scalar_one()
+    
     played_matches_query = select(func.count(Match.id)).where(
         Match.status == MatchStatusEnum.PLAYED
     )
     played_result = await db.execute(played_matches_query)
     played_count = played_result.scalar_one()
+    
+    cancelled_matches_query = select(func.count(Match.id)).where(
+        Match.status == MatchStatusEnum.CANCELLED
+    )
+    cancelled_result = await db.execute(cancelled_matches_query)
+    cancelled_count = cancelled_result.scalar_one()
     
     # Count teams by group
     group_a_query = select(func.count(Team.id)).where(
@@ -68,8 +80,10 @@ async def get_dashboard_stats(
         },
         "matches": {
             "scheduled": scheduled_count,
+            "in_progress": in_progress_count,
             "played": played_count,
-            "total": scheduled_count + played_count,
+            "cancelled": cancelled_count,
+            "total": scheduled_count + in_progress_count + played_count + cancelled_count,
         },
     }
 

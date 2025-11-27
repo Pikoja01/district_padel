@@ -53,7 +53,9 @@ export type DashboardStats = {
   };
   matches: {
     scheduled: number;
+    in_progress: number;
     played: number;
+    cancelled: number;
     total: number;
   };
 };
