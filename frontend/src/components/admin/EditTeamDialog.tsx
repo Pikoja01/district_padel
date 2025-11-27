@@ -36,6 +36,17 @@ interface TeamPlayer {
   role: "main" | "reserve";
 }
 
+/**
+ * Render a modal dialog for editing a team's name, group, and players.
+ *
+ * Loads team data for the given `teamId`, allows adjusting the team name (optional),
+ * group (A or B), and 2–3 players (at least two must be main), and submits updates.
+ *
+ * @param teamId - The identifier of the team to fetch and update.
+ * @param open - Whether the dialog is currently open.
+ * @param onOpenChange - Callback invoked when the dialog open state changes; receives the new open state.
+ * @returns The React element for the edit-team modal dialog.
+ */
 export function EditTeamDialog({ teamId, open, onOpenChange }: EditTeamDialogProps) {
   const { data: team, isLoading } = useAdminTeam(teamId);
   const updateTeam = useUpdateTeam();

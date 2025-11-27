@@ -13,8 +13,9 @@ from app.api.v1.admin.router import router as admin_router
 
 def validate_cors_origins_on_startup() -> None:
     """
-    Validate CORS_ORIGINS on application startup.
-    This ensures CORS is properly configured for production.
+    Validate the application's CORS origins configuration and emit warnings or confirmation at startup.
+    
+    Reads `settings.CORS_ORIGINS` and `settings.cors_origins_list`. If the raw `CORS_ORIGINS` value is missing or blank, prints a multi-line warning with deployment guidance to stderr and returns without exiting; if the parsed origins list is empty, prints a warning including the raw value and returns; if valid, prints a success message with the configured origins. Any exception raised during validation is caught and a warning with the exception message is printed to stderr.
     """
     try:
         cors_origins = settings.CORS_ORIGINS
@@ -49,9 +50,9 @@ def validate_cors_origins_on_startup() -> None:
 
 def validate_database_url_on_startup() -> None:
     """
-    Validate DATABASE_URL on application startup.
-    This ensures the service fails fast with a clear error message if DATABASE_URL
-    is missing or malformed, preventing silent failures later.
+    Validate the DATABASE_URL environment setting at application startup.
+    
+    Prints a clearly formatted error to stderr and exits the process with code 1 if DATABASE_URL is missing, only whitespace, or does not start with the expected PostgreSQL prefixes. On success the function returns without side effects.
     """
     try:
         # Settings validation happens during import, but we can provide better error messages
@@ -99,8 +100,9 @@ def validate_database_url_on_startup() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Lifespan context manager for startup and shutdown events.
-    Validates DATABASE_URL on startup before the application serves requests.
+    Provide the FastAPI lifespan context manager that runs startup and shutdown tasks.
+    
+    On startup, validates the DATABASE_URL and CORS origins and prints a confirmation message. On shutdown, performs no actions (placeholder for future cleanup).
     """
     # Startup: Validate database URL configuration
     validate_database_url_on_startup()
@@ -160,4 +162,3 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
-

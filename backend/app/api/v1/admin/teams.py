@@ -22,12 +22,16 @@ router = APIRouter()
 
 async def generate_team_name_from_players(players: List[TeamPlayerCreate], db: AsyncSession) -> str:
     """
-    Generate team name from players' surnames.
-    Takes the 2nd word (surname) from each player's name, extracts first 3 letters,
-    converts to uppercase, and joins them with " | " separator.
+    Create a team name from the players' surnames.
     
-    Example: "Marko Markovic", "Stefan Nikolic" -> "MAR | NIK"
-    Example: "Marko Markovic", "Stefan Nikolic", "Luka Petrovic" -> "MAR | NIK | PET"
+    For each entry in `players` this extracts the second word of the player's full name (surname) — using the provided `name` or fetching the Player by `player_id` from `db` if `name` is absent — takes the first three letters of that surname, converts them to uppercase, and joins the resulting codes with " | ". If no valid surnames are found, returns "TEAM".
+    
+    Parameters:
+        players (List[TeamPlayerCreate]): Player descriptors; each may include `name` or `player_id`.
+        db (AsyncSession): Database session used to load players when only `player_id` is provided.
+    
+    Returns:
+        str: Generated team name (e.g., "MAR | NIK") or "TEAM" when no surname codes are available.
     """
     surnames = []
     
@@ -60,8 +64,12 @@ async def _process_team_players(
     player_data_list: List[TeamPlayerCreate]
 ) -> List[tuple[UUID, PlayerRoleEnum]]:
     """
-    Process team players: convert role strings to enums, create new players if needed,
-    or use existing player IDs. Returns a list of (player_id, role_enum) tuples.
+    Create or resolve players from the provided list and return their IDs paired with validated role enums.
+    
+    Processes each TeamPlayerCreate entry: converts the role string to a PlayerRoleEnum (raises HTTP 400 for invalid roles), creates a new Player when a name is provided (flushing to obtain its ID), or uses the given player_id otherwise.
+    
+    Returns:
+        List[tuple[UUID, PlayerRoleEnum]]: A list of (player_id, role_enum) tuples for use when creating team-player relations.
     """
     player_ids_to_use = []
     for player_data in player_data_list:
@@ -97,7 +105,16 @@ async def create_team(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Create a new team.
+    Create a new team, optionally generating a name from the provided players, creating any new Player records, linking players to the team, and persisting the team and relations.
+    
+    Parameters:
+        team_data (TeamCreate): Data for the new team. If `name` is empty or blank, a name will be generated from the players' surnames. `players` may include new player names (which will create Player records) or existing `player_id` references.
+    
+    Returns:
+        TeamResponse: The created team's data, including its id, name, group, active flag, and a list of players with their id, name, and role (`"main"` or `"reserve"`).
+    
+    Raises:
+        HTTPException: Status 400 if a team with the resolved name already exists (or if validation performed by validate_team_creation fails).
     """
     # Validate team composition
     await validate_team_creation(team_data.players, db)
@@ -247,7 +264,22 @@ async def update_team(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Update team information including players.
+    Update a team's fields and optionally replace its player roster.
+    
+    If `team_data.name` is provided: a non-empty trimmed value is applied; an empty string triggers automatic name generation from the provided players (or from the team's existing players if none are provided). If the resulting name conflicts with another team, the update is rejected. When `team_data.players` is provided, the team's player membership is replaced: the new composition is validated, existing team-player relations are removed, and new relations are created (new Player records are created as needed). The function commits changes and returns the updated team representation.
+    
+    Parameters:
+        team_data (TeamUpdate): Update payload. Special behaviors:
+            - If `name` is None, the team's name is left unchanged.
+            - If `name` is the empty string (""), a name is generated from players.
+            - If `players` is provided, it replaces the current roster after validation.
+    
+    Returns:
+        TeamResponse: The updated team with its players and their roles (roles are lowercase strings).
+    
+    Raises:
+        HTTPException: 404 if the team does not exist.
+        HTTPException: 400 if the chosen/generated team name conflicts with an existing team or if team composition validation fails.
     """
     query = select(Team).where(Team.id == team_id).options(
         selectinload(Team.team_players).selectinload(TeamPlayer.player)
@@ -392,4 +424,3 @@ async def activate_team_endpoint(
         active=team.active,
         players=players
     )
-

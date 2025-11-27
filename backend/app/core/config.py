@@ -98,7 +98,12 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> List[str]:
-        """Parse CORS origins from comma-separated string"""
+        """
+        Parses the CORS_ORIGINS setting into a list of origin strings.
+        
+        Returns:
+            List[str]: Origins from `CORS_ORIGINS` with surrounding whitespace removed and empty entries filtered out.
+        """
         origins = self._csv_to_list(self.CORS_ORIGINS)
         # Filter out empty strings and strip whitespace
         origins = [origin.strip() for origin in origins if origin.strip()]
@@ -106,7 +111,12 @@ class Settings(BaseSettings):
 
     @property
     def cors_allow_methods_list(self) -> List[str]:
-        """HTTP methods allowed by CORS"""
+        """
+        Get the list of HTTP methods allowed by CORS.
+        
+        Returns:
+            List[str]: Parsed list of HTTP method names from `CORS_ALLOW_METHODS`; empty list if no methods are configured.
+        """
         return self._csv_to_list(self.CORS_ALLOW_METHODS)
 
     @property
@@ -126,5 +136,4 @@ class Settings(BaseSettings):
 
 # Create global settings instance
 settings = Settings()
-
 

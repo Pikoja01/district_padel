@@ -34,6 +34,15 @@ interface TeamPlayer {
   role: "main" | "reserve";
 }
 
+/**
+ * Render a dialog that collects team details and player entries, validates them, and submits a create-team request.
+ *
+ * The form enforces that the submitted team has 2–3 players with at least 2 players having role `main`. If the team name is empty it is sent as `undefined` so the backend can auto-generate it. On successful creation the form resets and the dialog is closed.
+ *
+ * @param open - Whether the dialog is visible
+ * @param onOpenChange - Callback invoked with the new open state; called with `false` after a successful creation
+ * @returns A JSX element containing the create-team dialog and form
+ */
 export function CreateTeamDialog({ open, onOpenChange }: CreateTeamDialogProps) {
   const createTeam = useCreateTeam();
   const [teamName, setTeamName] = useState("");
@@ -228,5 +237,4 @@ export function CreateTeamDialog({ open, onOpenChange }: CreateTeamDialogProps) 
     </Dialog>
   );
 }
-
 

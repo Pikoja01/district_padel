@@ -27,7 +27,16 @@ async def create_match(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Schedule a new match.
+    Schedule a new match using the provided match data.
+    
+    Parameters:
+        match_data (MatchCreate): Data for the match (date, group, home_team_id, away_team_id).
+    
+    Returns:
+        MatchResponse: The created match including related home/away team names and an empty `match_sets` list.
+    
+    Raises:
+        HTTPException: 400 if the home and away teams are the same or if either team does not belong to the match group; 404 if a specified team cannot be found.
     """
     # Validate teams are different
     if match_data.home_team_id == match_data.away_team_id:
@@ -178,8 +187,20 @@ async def update_match(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Update match information (date, teams, etc.).
-    Cannot update if match is already played.
+    Update fields of an existing match and return the updated match representation.
+    
+    Applies any provided fields from `match_data` (date, group, home_team_id, away_team_id) to the target match, validates that the home and away teams are different and that both teams exist and belong to the match's group when group or team identifiers change, then returns the refreshed MatchResponse including related teams and match sets.
+    
+    Parameters:
+        match_id (UUID): Identifier of the match to update.
+        match_data (MatchUpdate): Partial update payload; any non-null fields will be applied.
+    
+    Returns:
+        MatchResponse: The updated match with its status, related team names, and ordered match sets.
+    
+    Raises:
+        HTTPException: 404 if the match or referenced team is not found.
+        HTTPException: 400 if attempting to update a match with status PLAYED, if the home and away teams are the same, or if either team does not belong to the match's group.
     """
     query = select(Match).where(Match.id == match_id).options(
         selectinload(Match.home_team),
@@ -307,8 +328,11 @@ async def delete_match(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Cancel/delete a match.
-    Only allowed if match is not played (scheduled, in_progress, or cancelled).
+    Delete a scheduled or otherwise non-played match by ID.
+    
+    Raises:
+        HTTPException: 404 if no match with the given ID exists.
+        HTTPException: 400 if the match has status PLAYED and cannot be deleted.
     """
     query = select(Match).where(Match.id == match_id)
     result = await db.execute(query)
@@ -325,4 +349,3 @@ async def delete_match(
     
     await db.delete(match)
     await db.commit()
-

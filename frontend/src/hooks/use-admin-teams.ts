@@ -85,6 +85,11 @@ export function useUpdateTeam() {
   });
 }
 
+/**
+ * Provides a React Query mutation hook to delete an admin team by ID.
+ *
+ * @returns A mutation object that deletes a team when called; use `mutate(teamId)` or `mutateAsync(teamId)` to perform the deletion and observe status callbacks (`onSuccess`, `onError`, etc.).
+ */
 export function useDeleteTeam() {
   const queryClient = useQueryClient();
 
@@ -123,5 +128,4 @@ export function useActivateTeam() {
     },
   });
 }
-
 
