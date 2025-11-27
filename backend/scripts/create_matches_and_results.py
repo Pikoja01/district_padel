@@ -75,7 +75,6 @@ async def create_matches_and_results():
         print(f"   Found {len(existing_matches)} existing matches\n")
         
         # Create matches and results
-        match_ids = []
         today = date.today()
         day_offset = 0
         
