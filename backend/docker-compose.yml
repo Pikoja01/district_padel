@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: district_padel_postgres_db
+    environment:
+      POSTGRES_USER: district_padel
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-district_padel_dev}
+      POSTGRES_DB: district_padel
+    volumes:
+      - district_padel_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U district_padel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - district_padel_network
+
+  api:
+    build: .
+    container_name: district_padel_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://district_padel:${DB_PASSWORD:-district_padel_dev}@db:5432/district_padel
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
+      ALGORITHM: ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      API_V1_STR: ${API_V1_STR:-/api/v1}
+      PROJECT_NAME: ${PROJECT_NAME:-District Padel Backend}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:8080}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEBUG: ${DEBUG:-True}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - district_padel_network
+
+volumes:
+  district_padel_postgres_data:
+
+networks:
+  district_padel_network:
+    driver: bridge
+

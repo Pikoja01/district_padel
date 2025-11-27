@@ -14,7 +14,7 @@ export type Team = {
   active: boolean;
 };
 
-export type MatchStatus = "scheduled" | "played";
+export type MatchStatus = "scheduled" | "in_progress" | "played" | "cancelled";
 
 export type Match = {
   id: string;

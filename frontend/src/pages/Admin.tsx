@@ -1,65 +1,79 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { TeamsManagement } from "@/components/admin/TeamsManagement";
+import { MatchesManagement } from "@/components/admin/MatchesManagement";
+import { DashboardOverview } from "@/components/admin/DashboardOverview";
+import { SEOHead } from "@/components/layout/SEOHead";
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState("timovi");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab") || "pregled";
+  const [activeTab, setActiveTab] = useState(tabFromUrl);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Sync URL with tab state
+  useEffect(() => {
+    const urlTab = searchParams.get("tab") || "pregled";
+    if (urlTab !== activeTab) {
+      setActiveTab(urlTab);
+    }
+  }, [searchParams, activeTab]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchParams({ tab: value });
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/admin/login");
+  };
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Upravljanje ligom, timovima i utakmicama</p>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="timovi">Timovi</TabsTrigger>
-          <TabsTrigger value="utakmice">Utakmice</TabsTrigger>
-          <TabsTrigger value="pregled">Pregled lige</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="timovi" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Timovi</h2>
-            <Button className="gradient-hero">
-              <Plus className="w-4 h-4 mr-2" />
-              Dodaj tim
-            </Button>
+    <>
+      <SEOHead
+        title="Admin Dashboard - District Padel"
+        description="Administratorski panel za upravljanje ligom"
+        keywords="admin, district padel, liga admin"
+        canonicalUrl="https://districtpadel.rs/admin"
+      />
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Upravljanje ligom, timovima i utakmicama</p>
           </div>
-          <Card className="glass p-8">
-            <p className="text-muted-foreground text-center">
-              Admin funkcionalnost za upravljanje timovima će biti dostupna uskoro.
-            </p>
-          </Card>
-        </TabsContent>
+          <Button variant="outline" onClick={handleLogout}>
+            <LogOut className="w-4 h-4 mr-2" />
+            Odjavi se
+          </Button>
+        </div>
 
-        <TabsContent value="utakmice" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Utakmice</h2>
-            <Button className="gradient-hero">
-              <Plus className="w-4 h-4 mr-2" />
-              Dodaj utakmicu
-            </Button>
-          </div>
-          <Card className="glass p-8">
-            <p className="text-muted-foreground text-center">
-              Admin funkcionalnost za upravljanje utakmicama će biti dostupna uskoro.
-            </p>
-          </Card>
-        </TabsContent>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="pregled">Pregled lige</TabsTrigger>
+            <TabsTrigger value="timovi">Timovi</TabsTrigger>
+            <TabsTrigger value="utakmice">Utakmice</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="pregled" className="space-y-4">
-          <h2 className="text-2xl font-bold">Pregled lige</h2>
-          <Card className="glass p-8">
-            <p className="text-muted-foreground text-center">
-              Pregled statistika lige će biti dostupan uskoro.
-            </p>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </main>
+          <TabsContent value="pregled" className="space-y-4">
+            <DashboardOverview />
+          </TabsContent>
+
+          <TabsContent value="timovi" className="space-y-4">
+            <TeamsManagement />
+          </TabsContent>
+
+          <TabsContent value="utakmice" className="space-y-4">
+            <MatchesManagement />
+          </TabsContent>
+        </Tabs>
+      </main>
+    </>
   );
 }

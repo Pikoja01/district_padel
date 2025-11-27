@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,22 +11,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SEOHead } from "@/components/layout/SEOHead";
-import { teams } from "@/data/teams";
-import { matches } from "@/data/matches";
-import { calculateStandings } from "@/utils/calculateStandings";
+import { useStandings } from "@/hooks/use-standings";
 
 export default function League() {
   const [selectedGroup, setSelectedGroup] = useState<"A" | "B" | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const standings = useMemo(() => calculateStandings(teams, matches), []);
+  const {
+    data: standings = [],
+    isLoading,
+    error,
+  } = useStandings();
 
-  const filteredStandings = standings.filter((s) => {
-    const matchesGroup = selectedGroup === "all" || s.group === selectedGroup;
-    const matchesSearch = s.teamName.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesGroup && matchesSearch;
-  });
+  const filteredStandings = useMemo(() => {
+    return standings.filter((s) => {
+      const matchesGroup = selectedGroup === "all" || s.group === selectedGroup;
+      const matchesSearch = s.teamName.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesGroup && matchesSearch;
+    });
+  }, [standings, selectedGroup, searchQuery]);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -88,6 +94,15 @@ export default function League() {
           </div>
         </div>
 
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Greška pri učitavanju tabele. Molimo pokušajte ponovo.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="rounded-lg border border-border overflow-x-auto glass">
           <Table>
             <TableHeader>
@@ -104,38 +119,79 @@ export default function League() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredStandings.map((standing) => (
-                <TableRow key={standing.teamId} className="hover:bg-muted/50">
-                  <TableCell className="font-bold">{standing.position}</TableCell>
-                  <TableCell>
-                    <Link
-                      to={`/teams/${standing.teamId}`}
-                      className="hover:text-primary transition-colors font-medium"
-                    >
-                      {standing.teamName}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <span className="inline-block px-2 py-1 rounded bg-primary/20 text-primary text-xs font-semibold">
-                      {standing.group}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-center">{standing.matchesPlayed}</TableCell>
-                  <TableCell className="text-center text-win">{standing.matchesWon}</TableCell>
-                  <TableCell className="text-center text-lose">{standing.matchesLost}</TableCell>
-                  <TableCell className="text-center">
-                    {standing.setDiff > 0 ? "+" : ""}
-                    {standing.setDiff}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {standing.gameDiff > 0 ? "+" : ""}
-                    {standing.gameDiff}
-                  </TableCell>
-                  <TableCell className="text-center font-bold text-primary text-lg">
-                    {standing.points}
+              {isLoading ? (
+                // Loading skeleton
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-8" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-12 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-12 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-8 mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : filteredStandings.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                    Nema timova za prikaz
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredStandings.map((standing) => (
+                  <TableRow key={standing.teamId} className="hover:bg-muted/50">
+                    <TableCell className="font-bold">{standing.position}</TableCell>
+                    <TableCell>
+                      <Link
+                        to={`/teams/${standing.teamId}`}
+                        className="hover:text-primary transition-colors font-medium"
+                      >
+                        {standing.teamName}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className="inline-block px-2 py-1 rounded bg-primary/20 text-primary text-xs font-semibold">
+                        {standing.group}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center">{standing.matchesPlayed}</TableCell>
+                    <TableCell className="text-center text-win">{standing.matchesWon}</TableCell>
+                    <TableCell className="text-center text-lose">{standing.matchesLost}</TableCell>
+                    <TableCell className="text-center">
+                      {standing.setDiff > 0 ? "+" : ""}
+                      {standing.setDiff}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {standing.gameDiff > 0 ? "+" : ""}
+                      {standing.gameDiff}
+                    </TableCell>
+                    <TableCell className="text-center font-bold text-primary text-lg">
+                      {standing.points}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

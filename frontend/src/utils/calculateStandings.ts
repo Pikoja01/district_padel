@@ -16,6 +16,7 @@ export function calculateStandings(teams: Team[], matches: Match[]): TeamStandin
       let setsAgainst = 0;
       let gamesFor = 0;
       let gamesAgainst = 0;
+      let points = 0;
 
       teamMatches.forEach((match) => {
         const isHome = match.homeTeamId === team.id;
@@ -35,6 +36,18 @@ export function calculateStandings(teams: Team[], matches: Match[]): TeamStandin
           matchesLost++;
         }
 
+        // Calculate points based on sets won
+        // Points system: Win 2-0 = 3pts, Win 2-1 = 2pts, Lose 1-2 = 1pt, Lose 0-2 = 0pts
+        if (teamSetsWon === 2 && opponentSetsWon === 0) {
+          points += 3; // Win 2-0
+        } else if (teamSetsWon === 2 && opponentSetsWon === 1) {
+          points += 2; // Win 2-1
+        } else if (teamSetsWon === 1 && opponentSetsWon === 2) {
+          points += 1; // Lose 1-2 (got 1 set)
+        } else if (teamSetsWon === 0 && opponentSetsWon === 2) {
+          points += 0; // Lose 0-2
+        }
+
         const teamGamesFor = isHome
           ? match.homeSets.reduce((a, b) => a + b, 0)
           : match.awaySets.reduce((a, b) => a + b, 0);
@@ -48,7 +61,6 @@ export function calculateStandings(teams: Team[], matches: Match[]): TeamStandin
         gamesAgainst += teamGamesAgainst;
       });
 
-      const points = matchesWon * 3;
       const setDiff = setsFor - setsAgainst;
       const gameDiff = gamesFor - gamesAgainst;
 

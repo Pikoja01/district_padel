@@ -1,42 +1,38 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Trophy, Users } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft, Trophy, Users, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SEOHead } from "@/components/layout/SEOHead";
-import { teams } from "@/data/teams";
-import { matches } from "@/data/matches";
-import { calculateStandings } from "@/utils/calculateStandings";
+import { useTeam, useTeams } from "@/hooks/use-teams";
+import { useTeamStanding } from "@/hooks/use-standings";
+import { useMatches } from "@/hooks/use-matches";
+import type { Match } from "@/types";
 
 export default function TeamDetail() {
   const { teamId } = useParams();
   const navigate = useNavigate();
-  const team = teams.find((t) => t.id === teamId);
 
-  if (!team) {
-    return (
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Tim nije pronađen</h1>
-          <Button onClick={() => navigate("/league")}>Nazad na tabelu</Button>
-        </div>
-      </main>
-    );
-  }
+  const { data: team, isLoading: teamLoading, error: teamError } = useTeam(teamId);
+  const { data: teamStanding, isLoading: standingLoading } = useTeamStanding(teamId);
+  const { data: allMatches = [], isLoading: matchesLoading } = useMatches({ status: "played" });
+  const { data: allTeams = [] } = useTeams();
 
-  const standings = calculateStandings(teams, matches);
-  const teamStanding = standings.find((s) => s.teamId === teamId);
-
-  const teamMatches = matches.filter(
-    (m) => (m.homeTeamId === teamId || m.awayTeamId === teamId) && m.status === "played"
+  const teamMatches = allMatches.filter(
+    (m) => (m.homeTeamId === teamId || m.awayTeamId === teamId)
   );
 
-  const getOpponentName = (match: typeof matches[0]) => {
+  const getOpponentName = (match: Match) => {
     const opponentId = match.homeTeamId === teamId ? match.awayTeamId : match.homeTeamId;
-    return teams.find((t) => t.id === opponentId)?.name || "Unknown";
+    const opponent = allTeams.find((t) => t.id === opponentId);
+    return opponent?.name || "Unknown";
   };
 
-  const getResult = (match: typeof matches[0]) => {
+  const getResult = (match: Match) => {
+    if (!teamId) return { formatted: "", isWin: false };
+    
     const isHome = match.homeTeamId === teamId;
     const teamSets = isHome ? match.homeSets : match.awaySets;
     const opponentSets = isHome ? match.awaySets : match.homeSets;
@@ -51,6 +47,37 @@ export default function TeamDetail() {
       isWin,
     };
   };
+
+  const isLoading = teamLoading || standingLoading || matchesLoading;
+
+  if (isLoading) {
+    return (
+      <main className="container mx-auto px-4 py-8">
+        <Skeleton className="h-10 w-32 mb-6" />
+        <div className="space-y-8">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </main>
+    );
+  }
+
+  if (teamError || !team) {
+    return (
+      <main className="container mx-auto px-4 py-8">
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {teamError ? "Greška pri učitavanju tima." : "Tim nije pronađen"}
+          </AlertDescription>
+        </Alert>
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">Tim nije pronađen</h1>
+          <Button onClick={() => navigate("/league")}>Nazad na tabelu</Button>
+        </div>
+      </main>
+    );
+  }
 
   const structuredData = {
     "@context": "https://schema.org",
