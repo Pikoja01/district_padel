@@ -54,8 +54,9 @@ async def enter_match_result(
     if not match:
         raise NotFoundError(f"Match {match_id} not found")
     
-    # Allow updating results if match is scheduled or in progress
-    if match.status not in [MatchStatusEnum.SCHEDULED, MatchStatusEnum.IN_PROGRESS]:
+    # Allow updating results for scheduled, in_progress, or played matches
+    # (played matches can be edited to fix errors)
+    if match.status == MatchStatusEnum.CANCELLED:
         raise ValueError(f"Match {match_id} cannot be updated (status: {match.status})")
     
     # Validate that no sets have empty/zero scores for both teams
@@ -93,22 +94,24 @@ async def enter_match_result(
 def determine_match_winner(match: Match) -> UUID | None:
     """
     Determine the winner of a match based on sets won.
+    Match is won when a team wins 2 sets (best of 3).
     
     Args:
         match: Match object with match_sets loaded
     
     Returns:
-        UUID of winning team, or None if match not completed
+        UUID of winning team, or None if match not completed (no team has won 2 sets yet)
     """
     if not match.match_sets:
         return None
     
     home_sets_won, away_sets_won = count_sets_won(match.match_sets)
     
-    if home_sets_won > away_sets_won:
+    # Match is won when a team wins 2 sets (best of 3)
+    if home_sets_won >= 2:
         return match.home_team_id
-    elif away_sets_won > home_sets_won:
+    elif away_sets_won >= 2:
         return match.away_team_id
     else:
-        return None
+        return None  # No team has won 2 sets yet, match still in progress
 
