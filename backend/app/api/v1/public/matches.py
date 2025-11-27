@@ -6,7 +6,7 @@ from uuid import UUID
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
