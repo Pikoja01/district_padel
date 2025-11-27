@@ -1,0 +1,120 @@
+services:
+  # Backend API Service
+  # 
+  # IMPORTANT: Before deploying, you MUST:
+  # 1. Create a PostgreSQL database on Render (see DEPLOYMENT.md)
+  # 2. Set DATABASE_URL environment variable manually (cannot be automated in render.yaml)
+  # 
+  # For complete setup instructions, see: backend/docs/DEPLOYMENT.md
+  - type: web
+    name: district-padel-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      # Database Configuration
+      # 
+      # ⚠️ REQUIRED: This MUST be set manually after creating the PostgreSQL database.
+      # 
+      # Steps to set DATABASE_URL:
+      # 1. Create PostgreSQL database in Render Dashboard (New + → PostgreSQL)
+      # 2. Copy the "Internal Database URL" from database dashboard
+      # 3. Go to this web service → Environment tab → Edit DATABASE_URL
+      # 4. Paste the Internal Database URL
+      # 5. Ensure it uses format: postgresql+asyncpg://user:password@hostname:5432/database
+      #    (If it starts with postgresql://, add +asyncpg after postgresql)
+      # 
+      # The application will fail fast on startup if DATABASE_URL is missing or malformed.
+      # For detailed instructions and troubleshooting, see: backend/docs/DEPLOYMENT.md
+      - key: DATABASE_URL
+        sync: false  # Must be set manually - cannot be automated in render.yaml
+      
+      # Security
+      - key: SECRET_KEY
+        generateValue: true  # Render will generate a secure key
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 1440
+        
+      # API
+      - key: API_V1_STR
+        value: /api/v1
+      - key: PROJECT_NAME
+        value: District Padel Backend
+        
+      # CORS Configuration
+      # 
+      # ⚠️ REQUIRED: Set this manually in Render Dashboard to allow frontend requests.
+      # 
+      # Steps to set CORS_ORIGINS:
+      # 1. Go to web service → Environment tab
+      # 2. Find or create CORS_ORIGINS environment variable
+      # 3. Set value as comma-separated list of allowed frontend URLs
+      #    Example: https://your-frontend.vercel.app,https://your-frontend.com
+      # 
+      # Common patterns:
+      # - Production: https://your-frontend.vercel.app
+      # - Preview/staging: https://your-preview-branch.vercel.app
+      # - Local dev (optional): http://localhost:5173,http://localhost:8080
+      # 
+      # The application reads this at runtime to build the allowed origins list.
+      # See backend/docs/DEPLOYMENT.md for detailed setup instructions.
+      - key: CORS_ORIGINS
+        sync: false  # Must be set manually in Render Dashboard - no default value
+        
+      # Environment
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      
+      # Admin User Configuration
+      # 
+      # ⚠️ REQUIRED: Set these manually in Render Dashboard for automatic admin user creation.
+      # 
+      # Steps to set admin credentials:
+      # 1. Go to web service → Environment tab
+      # 2. Set ADMIN_USERNAME (e.g., admin@yourdomain.com)
+      # 3. Set ADMIN_PASSWORD (use a strong password - consider Render's Secret environment variables)
+      # 4. Set ADMIN_EMAIL (typically same as username or a valid email)
+      # 
+      # Security Best Practices:
+      # - Use Render's "Secret" environment variables for ADMIN_PASSWORD (not plain text)
+      # - Use strong, randomly generated passwords
+      # - Never commit credentials to version control
+      # 
+      # If these variables are set, an admin user will be created automatically on first startup
+      # if no admin user exists. If not set, admin user must be created manually.
+      # 
+      # See backend/docs/DEPLOYMENT.md for detailed setup instructions.
+      - key: ADMIN_USERNAME
+        sync: false  # Must be set manually in Render Dashboard - no default value
+      - key: ADMIN_PASSWORD
+        sync: false  # Must be set manually - use Render's Secret environment variables for security
+      - key: ADMIN_EMAIL
+        sync: false  # Must be set manually in Render Dashboard - no default value
+
+# ==============================================================================
+# DATABASE SETUP REQUIRED
+# ==============================================================================
+# 
+# PostgreSQL database must be created manually before deploying this service.
+# 
+# Quick Setup:
+#   1. Render Dashboard → New + → PostgreSQL
+#   2. Name: district-padel-db (or your preferred name)
+#   3. Copy "Internal Database URL" from database dashboard
+#   4. Web Service → Environment → Set DATABASE_URL to Internal URL
+#   5. Ensure URL format: postgresql+asyncpg://user:pass@host:port/dbname
+# 
+# For complete deployment guide with troubleshooting, see:
+#   backend/docs/DEPLOYMENT.md
+# 
+# The application includes startup validation - it will exit immediately with
+# a clear error message if DATABASE_URL is missing or malformed.
+# ==============================================================================
+
