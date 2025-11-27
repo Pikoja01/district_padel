@@ -5,9 +5,11 @@ import asyncio
 import httpx
 from datetime import date, timedelta
 
+import os
+
 BASE_URL = "http://localhost:8000"
-USERNAME = "admin@test"
-PASSWORD = "admin123"
+USERNAME = os.environ.get("ADMIN_USERNAME", "admin@test")
+PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 
 async def create_matches_and_results():
