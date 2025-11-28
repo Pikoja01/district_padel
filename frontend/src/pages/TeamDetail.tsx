@@ -110,7 +110,7 @@ export default function TeamDetail() {
         title={`${team.name} - District Padel Liga | Tim Profil`}
         description={`Pogledajte profil, statistike i rezultate tima ${team.name} u District Padel Ligi. Igrači, utakmice i plasman u tabeli.`}
         keywords={`${team.name}, padel tim, padel liga, district padel, grupa ${team.group}`}
-        canonicalUrl={`https://districtpadel.rs/teams/${teamId}`}
+        canonicalUrl={`https://districtpadelclub.com/teams/${teamId}`}
         structuredData={structuredData}
       />
 
@@ -183,7 +183,7 @@ export default function TeamDetail() {
           <div>
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
               <Trophy className="w-6 h-6 text-primary" />
-              Nedavne utakmice
+              Nedavni Mečevi
             </h2>
             {matchesError ? (
               <Alert variant="destructive">

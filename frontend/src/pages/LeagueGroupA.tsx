@@ -24,7 +24,7 @@ export default function LeagueGroupA() {
         title="Grupa A - District Padel Liga | Tabela i Rezultati"
         description="Tabela i rezultati Grupe A u District Padel Ligi. Pratite najbolje timove u prvoj grupi padel lige Srbije."
         keywords="padel liga grupa a, padel tabela grupa a, district padel grupa a"
-        canonicalUrl="https://districtpadel.rs/league/grupa-a"
+        canonicalUrl="https://districtpadelclub.com/league/grupa-a"
       />
 
       <main className="container mx-auto px-4 py-8">
@@ -50,7 +50,7 @@ export default function LeagueGroupA() {
               <TableRow>
                 <TableHead className="w-16">Poz</TableHead>
                 <TableHead>Tim</TableHead>
-                <TableHead className="text-center">Utakmice</TableHead>
+                <TableHead className="text-center">Mečevi</TableHead>
                 <TableHead className="text-center">Pobede</TableHead>
                 <TableHead className="text-center">Porazi</TableHead>
                 <TableHead className="text-center">Set razlika</TableHead>

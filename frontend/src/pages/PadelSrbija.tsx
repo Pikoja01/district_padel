@@ -66,7 +66,7 @@ export default function PadelSrbija() {
         title="Padel Srbija - Sve o Padelu u Srbiji | District Padel Club"
         description="Kompletan vodič o padelu u Srbiji. Gde igrati, kako početi, pravila igre, liga, teren i turniri. District Padel - najbolji padel klub u Srbiji."
         keywords="padel srbija, padel u srbiji, šta je padel, padel pravila, padel sport srbija, kako igrati padel, padel klub"
-        canonicalUrl="https://districtpadel.rs/padel-srbija"
+        canonicalUrl="https://districtpadelclub.com/padel-srbija"
         structuredData={structuredData}
       />
 

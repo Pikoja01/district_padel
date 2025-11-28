@@ -9,7 +9,7 @@ export default function Contact() {
         title="Kontakt - District Padel Club | Rezervacija i Informacije"
         description="Kontaktirajte District Padel Club za rezervacije, informacije i upit e. Nalazimo se u Sremskoj Mitrovici. Pozovite nas danas!"
         keywords="kontakt padel, rezervacija padel, padel srbija kontakt, district padel kontakt, sremska mitrovica padel"
-        canonicalUrl="https://districtpadel.rs/contact"
+        canonicalUrl="https://districtpadelclub.com/contact"
       />
 
       <main className="container mx-auto px-4 py-8">

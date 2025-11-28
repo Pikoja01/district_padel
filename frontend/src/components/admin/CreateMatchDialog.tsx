@@ -83,7 +83,7 @@ export function CreateMatchDialog({ open, onOpenChange }: CreateMatchDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Zakazi novu utakmicu</DialogTitle>
+          <DialogTitle>Zakazi novi Meč</DialogTitle>
           <DialogDescription>
             Izaberite datum, grupu i timove koji će igrati.
           </DialogDescription>
@@ -175,7 +175,7 @@ export function CreateMatchDialog({ open, onOpenChange }: CreateMatchDialogProps
                   Zakazivanje...
                 </>
               ) : (
-                "Zakazi utakmicu"
+                "Zakazi Meč"
               )}
             </Button>
           </DialogFooter>

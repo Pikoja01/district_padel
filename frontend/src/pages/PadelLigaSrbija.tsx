@@ -24,7 +24,7 @@ export default function PadelLigaSrbija() {
     organizer: {
       "@type": "Organization",
       name: "District Padel Club",
-      url: "https://districtpadel.rs",
+      url: "https://districtpadelclub.com",
     },
   };
 
@@ -34,7 +34,7 @@ export default function PadelLigaSrbija() {
         title="Padel Liga Srbija - District Padel Liga | Naša Lokalna Liga"
         description="Pridružite se najuzbudljivijoj padel ligi u Srbiji! District Padel Liga - naša lokalna liga sa praćenjem statistika, timovima i rangiranjem."
         keywords="padel liga srbija, padel turnir, padel takmičenje, district padel liga, padel league serbia"
-        canonicalUrl="https://districtpadel.rs/padel-liga-srbija"
+        canonicalUrl="https://districtpadelclub.com/padel-liga-srbija"
         structuredData={structuredData}
       />
 

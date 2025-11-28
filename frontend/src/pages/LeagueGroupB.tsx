@@ -24,7 +24,7 @@ export default function LeagueGroupB() {
         title="Grupa B - District Padel Liga | Tabela i Rezultati"
         description="Tabela i rezultati Grupe B u District Padel Ligi. Pratite najbolje timove u drugoj grupi padel lige Srbije."
         keywords="padel liga grupa b, padel tabela grupa b, district padel grupa b"
-        canonicalUrl="https://districtpadel.rs/league/grupa-b"
+        canonicalUrl="https://districtpadelclub.com/league/grupa-b"
       />
 
       <main className="container mx-auto px-4 py-8">
@@ -50,7 +50,7 @@ export default function LeagueGroupB() {
               <TableRow>
                 <TableHead className="w-16">Poz</TableHead>
                 <TableHead>Tim</TableHead>
-                <TableHead className="text-center">Utakmice</TableHead>
+                <TableHead className="text-center">Mečevi</TableHead>
                 <TableHead className="text-center">Pobede</TableHead>
                 <TableHead className="text-center">Porazi</TableHead>
                 <TableHead className="text-center">Set razlika</TableHead>
