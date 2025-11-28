@@ -107,7 +107,7 @@ export function MatchesManagement() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Meč</h2>
+        <h2 className="text-2xl font-bold">Mečevi</h2>
         <Button className="gradient-hero" onClick={() => setCreateDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Zakazi Meč

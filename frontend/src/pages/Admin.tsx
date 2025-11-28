@@ -58,7 +58,7 @@ export default function Admin() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="pregled">Pregled lige</TabsTrigger>
             <TabsTrigger value="timovi">Timovi</TabsTrigger>
-            <TabsTrigger value="utakmice">Meč</TabsTrigger>
+            <TabsTrigger value="utakmice">Mečevi</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pregled" className="space-y-4">
