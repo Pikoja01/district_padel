@@ -3,6 +3,7 @@
  */
 import { useState } from "react";
 import { Plus, Edit, Archive, ArchiveRestore, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -84,9 +85,16 @@ export function TeamsManagement() {
             <TableBody>
               {teams.map((team) => (
                 <TableRow key={team.id} className={team.active ? "" : "opacity-60"}>
-                  <TableCell className="font-medium">{team.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link 
+                      to={`/teams/${team.id}`}
+                      className="hover:underline text-primary"
+                    >
+                      {team.name}
+                    </Link>
+                  </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant="outline">Grupa {team.group}</Badge>
+                    <Badge variant="outline" className="border-primary text-primary">Grupa {team.group}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

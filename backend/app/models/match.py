@@ -1,7 +1,7 @@
 """
 Match and MatchSet models
 """
-from sqlalchemy import Column, Date, ForeignKey, Integer, Enum as SQLEnum, CheckConstraint
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Enum as SQLEnum, CheckConstraint, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -29,8 +29,9 @@ class Match(Base):
     __tablename__ = "matches"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    date = Column(Date, nullable=False, index=True)
+    date = Column(DateTime, nullable=False, index=True)
     group = Column(SQLEnum(GroupEnum), nullable=False, index=True)
+    round = Column(String(50), nullable=True, index=True)  # Round number (e.g., "1", "2", "QF", "SF", "Final")
     home_team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id"), nullable=False)
     away_team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id"), nullable=False)
     status = Column(SQLEnum(MatchStatusEnum), default=MatchStatusEnum.SCHEDULED, nullable=False, index=True)

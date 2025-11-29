@@ -65,6 +65,7 @@ export function useUpdateMatch() {
       data: {
         date?: string;
         group?: "A" | "B";
+        round?: string | null;
         home_team_id?: string;
         away_team_id?: string;
       };

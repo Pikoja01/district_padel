@@ -127,7 +127,7 @@ export function DashboardOverview() {
                 {standings.slice(0, 10).map((standing) => (
                   <TableRow key={standing.teamId}>
                     <TableCell className="font-bold">{standing.position}</TableCell>
-                    <TableCell className="font-medium">{standing.teamName}</TableCell>
+                    <TableCell className="font-medium text-primary">{standing.teamName}</TableCell>
                     <TableCell className="text-center">
                       <span className="inline-block px-2 py-1 rounded bg-primary/20 text-primary text-xs font-semibold">
                         {standing.group}

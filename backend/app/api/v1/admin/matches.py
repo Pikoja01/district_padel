@@ -3,10 +3,17 @@ Admin matches management endpoints
 """
 from typing import List
 from uuid import UUID
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
+
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    # Fallback for Python < 3.9
+    from backports.zoneinfo import ZoneInfo
 
 from app.core.database import get_db
 from app.api.deps import get_current_user
@@ -16,6 +23,9 @@ from app.models.team import Team, GroupEnum
 from app.schemas.match import MatchCreate, MatchUpdate, MatchResponse, MatchResultCreate, MatchSetResponse
 from app.services.match_service import enter_match_result
 from app.exceptions import NotFoundError
+
+# Serbian timezone (Europe/Belgrade)
+SERBIAN_TZ = ZoneInfo("Europe/Belgrade")
 
 router = APIRouter()
 
@@ -58,9 +68,19 @@ async def create_match(
         )
     
     # Create match
+    # Convert datetime to Serbian timezone (naive datetime stored as Serbian time)
+    date_value = match_data.date
+    if date_value.tzinfo is not None:
+        # Convert from any timezone to Serbian timezone, then remove timezone info
+        date_value = date_value.astimezone(SERBIAN_TZ).replace(tzinfo=None)
+    else:
+        # If naive, assume it's already in Serbian time (no conversion needed)
+        pass
+    
     match = Match(
-        date=match_data.date,
+        date=date_value,
         group=match_data.group,
+        round=match_data.round,
         home_team_id=match_data.home_team_id,
         away_team_id=match_data.away_team_id,
         status=MatchStatusEnum.SCHEDULED,
@@ -73,6 +93,7 @@ async def create_match(
         id=match.id,
         date=match.date,
         group=match.group,
+        round=match.round,
         home_team_id=match.home_team_id,
         away_team_id=match.away_team_id,
         status=match.status,
@@ -115,6 +136,7 @@ async def list_matches(
             id=match.id,
             date=match.date,
             group=match.group,
+            round=match.round,
             home_team_id=match.home_team_id,
             away_team_id=match.away_team_id,
             status=match.status,
@@ -161,6 +183,7 @@ async def get_match(
         id=match.id,
         date=match.date,
         group=match.group,
+        round=match.round,
         home_team_id=match.home_team_id,
         away_team_id=match.away_team_id,
         status=match.status,
@@ -197,9 +220,19 @@ async def update_match(
     
     # Update fields
     if match_data.date is not None:
-        match.date = match_data.date
+        # Convert datetime to Serbian timezone (naive datetime stored as Serbian time)
+        date_value = match_data.date
+        if date_value.tzinfo is not None:
+            # Convert from any timezone to Serbian timezone, then remove timezone info
+            date_value = date_value.astimezone(SERBIAN_TZ).replace(tzinfo=None)
+        else:
+            # If naive, assume it's already in Serbian time (no conversion needed)
+            pass
+        match.date = date_value
     if match_data.group is not None:
         match.group = match_data.group
+    if match_data.round is not None:
+        match.round = match_data.round
     if match_data.home_team_id is not None:
         match.home_team_id = match_data.home_team_id
     if match_data.away_team_id is not None:
@@ -245,6 +278,7 @@ async def update_match(
         id=match.id,
         date=match.date,
         group=match.group,
+        round=match.round,
         home_team_id=match.home_team_id,
         away_team_id=match.away_team_id,
         status=match.status,

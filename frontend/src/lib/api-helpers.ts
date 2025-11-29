@@ -42,6 +42,7 @@ export function transformMatch(apiMatch: ApiMatch): Match {
     id: apiMatch.id,
     date: apiMatch.date,
     group: apiMatch.group,
+    kolo: apiMatch.round || null,
     homeTeamId: apiMatch.home_team_id,
     awayTeamId: apiMatch.away_team_id,
     homeSets,

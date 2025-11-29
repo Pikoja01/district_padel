@@ -20,6 +20,7 @@ export type Match = {
   id: string;
   date: string;
   group: "A" | "B";
+  kolo?: string | null;
   homeTeamId: string;
   awayTeamId: string;
   homeSets: number[];
