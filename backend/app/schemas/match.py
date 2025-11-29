@@ -3,7 +3,7 @@ Match schemas for request/response validation
 """
 from pydantic import BaseModel, field_validator
 from uuid import UUID
-from datetime import date
+from datetime import date, datetime
 from typing import List, Optional
 from app.models.team import GroupEnum
 from app.models.match import MatchStatusEnum
@@ -34,8 +34,9 @@ class MatchSetCreate(BaseModel):
 
 class MatchBase(BaseModel):
     """Base match schema"""
-    date: date
+    date: datetime
     group: GroupEnum
+    round: Optional[str] = None
     home_team_id: UUID
     away_team_id: UUID
 
@@ -72,8 +73,9 @@ class MatchResultCreate(BaseModel):
 
 class MatchUpdate(BaseModel):
     """Schema for updating a match"""
-    date: Optional[date] = None
+    date: Optional[datetime] = None
     group: Optional[GroupEnum] = None
+    round: Optional[str] = None
     home_team_id: Optional[UUID] = None
     away_team_id: Optional[UUID] = None
 

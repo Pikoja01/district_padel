@@ -108,7 +108,7 @@ export default function TeamDetail() {
     <>
       <SEOHead
         title={`${team.name} - District Padel Liga | Tim Profil`}
-        description={`Pogledajte profil, statistike i rezultate tima ${team.name} u District Padel Ligi. Igrači, utakmice i plasman u tabeli.`}
+        description={`Pogledajte profil, statistike i rezultate tima ${team.name} u District Padel Ligi. Igrači, mecevi i plasman u tabeli.`}
         keywords={`${team.name}, padel tim, padel liga, district padel, grupa ${team.group}`}
         canonicalUrl={`https://districtpadelclub.com/teams/${teamId}`}
         structuredData={structuredData}
@@ -123,7 +123,7 @@ export default function TeamDetail() {
           <div className="glass rounded-lg p-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <div>
-                <h1 className="text-4xl md:text-5xl font-bold mb-2">{team.name}</h1>
+                <h1 className="text-4xl md:text-5xl font-bold mb-2 text-primary">{team.name}</h1>
                 <div className="flex gap-2">
                   <Badge className="bg-primary text-primary-foreground">Grupa {team.group}</Badge>
                   {teamStanding && (
@@ -189,12 +189,12 @@ export default function TeamDetail() {
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Greška pri učitavanju utakmica. Molimo pokušajte ponovo.
+                  Greška pri učitavanju meceva. Molimo pokušajte ponovo.
                 </AlertDescription>
               </Alert>
             ) : teamMatches.length === 0 ? (
               <Card className="glass p-8 text-center text-muted-foreground">
-                Još nema odigranih utakmica
+                Još nema odigranih meceva
               </Card>
             ) : (
               <div className="space-y-4">
@@ -204,7 +204,15 @@ export default function TeamDetail() {
                     <Card key={match.id} className="glass p-6">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex-1">
-                          <div className="text-sm text-muted-foreground mb-1">{match.date}</div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            {new Date(match.date).toLocaleString("sr-RS", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
                           <div className="font-semibold">
                             vs{" "}
                             <Link

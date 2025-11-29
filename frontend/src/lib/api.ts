@@ -29,6 +29,7 @@ export type ApiMatch = {
   id: string;
   date: string;
   group: "A" | "B";
+  round?: string | null;
   home_team_id: string;
   away_team_id: string;
   status: "scheduled" | "in_progress" | "played" | "cancelled";
@@ -282,6 +283,7 @@ export const adminApi = {
   createMatch: async (data: {
     date: string;
     group: "A" | "B";
+    round?: string | null;
     home_team_id: string;
     away_team_id: string;
   }): Promise<ApiMatch> => {
@@ -296,6 +298,7 @@ export const adminApi = {
     data: {
       date?: string;
       group?: "A" | "B";
+      round?: string | null;
       home_team_id?: string;
       away_team_id?: string;
     }

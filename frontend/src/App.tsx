@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "next-themes";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -26,47 +27,49 @@ import PadelLigaSrbija from "./pages/PadelLigaSrbija";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <div className="flex-1 pt-16">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/courts" element={<Courts />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/league" element={<League />} />
-                <Route path="/league/grupa-a" element={<LeagueGroupA />} />
-                <Route path="/league/grupa-b" element={<LeagueGroupB />} />
-                <Route path="/teams/:teamId" element={<TeamDetail />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute>
-                      <Admin />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/padel-srbija" element={<PadelSrbija />} />
-                <Route path="/padel-sremska-mitrovica" element={<PadelSremskaMitrovica />} />
-                <Route path="/padel-liga-srbija" element={<PadelLigaSrbija />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+  <ThemeProvider attribute="class" defaultTheme="dark" storageKey="district-padel-theme">
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <div className="flex-1 pt-16">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/courts" element={<Courts />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/league" element={<League />} />
+                  <Route path="/league/grupa-a" element={<LeagueGroupA />} />
+                  <Route path="/league/grupa-b" element={<LeagueGroupB />} />
+                  <Route path="/teams/:teamId" element={<TeamDetail />} />
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute>
+                        <Admin />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/padel-srbija" element={<PadelSrbija />} />
+                  <Route path="/padel-sremska-mitrovica" element={<PadelSremskaMitrovica />} />
+                  <Route path="/padel-liga-srbija" element={<PadelLigaSrbija />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+              <Footer />
             </div>
-            <Footer />
-          </div>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;

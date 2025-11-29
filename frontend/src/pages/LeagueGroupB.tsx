@@ -105,7 +105,7 @@ export default function LeagueGroupB() {
                     <TableCell>
                       <Link
                         to={`/teams/${standing.teamId}`}
-                        className="hover:text-primary transition-colors font-medium"
+                        className="text-primary hover:opacity-80 transition-opacity font-medium"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {standing.teamName}

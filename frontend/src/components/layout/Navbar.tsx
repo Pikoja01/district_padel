@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/district-logo.png";
 
 const navLinks = [
@@ -30,16 +31,19 @@ export function Navbar() {
                 <Link to={link.path}>{link.name}</Link>
               </Button>
             ))}
+            <ThemeToggle />
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X /> : <Menu />}
-          </Button>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X /> : <Menu />}
+            </Button>
+          </div>
         </div>
 
         {isOpen && (

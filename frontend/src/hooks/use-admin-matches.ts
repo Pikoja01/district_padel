@@ -45,10 +45,10 @@ export function useCreateMatch() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "matches"] });
       queryClient.invalidateQueries({ queryKey: ["matches"] });
-      toast.success("Utakmica je uspešno zakazana");
+      toast.success("Mec je uspešno zakazan");
     },
     onError: (error: any) => {
-      toast.error(error?.message || "Greška pri zakazivanju utakmice");
+      toast.error(error?.message || "Greška pri zakazivanju meca");
     },
   });
 }
@@ -65,6 +65,7 @@ export function useUpdateMatch() {
       data: {
         date?: string;
         group?: "A" | "B";
+        round?: string | null;
         home_team_id?: string;
         away_team_id?: string;
       };
@@ -76,10 +77,10 @@ export function useUpdateMatch() {
       queryClient.invalidateQueries({ queryKey: ["admin", "matches"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "match", variables.matchId] });
       queryClient.invalidateQueries({ queryKey: ["matches"] });
-      toast.success("Utakmica je uspešno ažurirana");
+      toast.success("Mec je uspešno ažuriran");
     },
     onError: (error: any) => {
-      toast.error(error?.message || "Greška pri ažuriranju utakmice");
+      toast.error(error?.message || "Greška pri ažuriranju meca");
     },
   });
 }
@@ -110,7 +111,7 @@ export function useEnterMatchResult() {
       queryClient.invalidateQueries({ queryKey: ["admin", "match", variables.matchId] });
       queryClient.invalidateQueries({ queryKey: ["matches"] });
       queryClient.invalidateQueries({ queryKey: ["standings"] });
-      toast.success("Rezultat utakmice je uspešno unet");
+      toast.success("Rezultat meca je uspešno unet");
     },
     onError: (error: any) => {
       toast.error(error?.message || "Greška pri unošenju rezultata");
@@ -129,10 +130,10 @@ export function useDeleteMatch() {
       queryClient.invalidateQueries({ queryKey: ["admin", "matches"] });
       queryClient.invalidateQueries({ queryKey: ["matches"] });
       queryClient.invalidateQueries({ queryKey: ["standings"] });
-      toast.success("Utakmica je uspešno otkazana");
+      toast.success("Mec je uspešno otkazan");
     },
     onError: (error: any) => {
-      toast.error(error?.message || "Greška pri otkazivanju utakmice");
+      toast.error(error?.message || "Greška pri otkazivanju meca");
     },
   });
 }

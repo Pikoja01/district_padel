@@ -1,6 +1,7 @@
 /**
  * Dashboard overview component showing league statistics
  */
+import { Link } from "react-router-dom";
 import { useDashboardStats } from "@/hooks/use-admin-dashboard";
 import { useStandings } from "@/hooks/use-standings";
 import { Card } from "@/components/ui/card";
@@ -127,7 +128,15 @@ export function DashboardOverview() {
                 {standings.slice(0, 10).map((standing) => (
                   <TableRow key={standing.teamId}>
                     <TableCell className="font-bold">{standing.position}</TableCell>
-                    <TableCell className="font-medium">{standing.teamName}</TableCell>
+                    <TableCell>
+                      <Link
+                        to={`/teams/${standing.teamId}`}
+                        className="font-medium text-primary hover:opacity-80 transition-opacity"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {standing.teamName}
+                      </Link>
+                    </TableCell>
                     <TableCell className="text-center">
                       <span className="inline-block px-2 py-1 rounded bg-primary/20 text-primary text-xs font-semibold">
                         {standing.group}
