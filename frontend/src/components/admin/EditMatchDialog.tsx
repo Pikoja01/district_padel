@@ -65,6 +65,16 @@ export function EditMatchDialog({ matchId, open, onOpenChange }: EditMatchDialog
 
   const groupTeams = teams.filter((t) => t.group === group && t.active);
 
+  // Reset team IDs when group changes or when selected teams are not in the new group
+  useEffect(() => {
+    if (homeTeamId && !groupTeams.find((t) => t.id === homeTeamId)) {
+      setHomeTeamId("");
+    }
+    if (awayTeamId && !groupTeams.find((t) => t.id === awayTeamId)) {
+      setAwayTeamId("");
+    }
+  }, [group, groupTeams, homeTeamId, awayTeamId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -165,7 +175,15 @@ export function EditMatchDialog({ matchId, open, onOpenChange }: EditMatchDialog
 
           <div className="space-y-2">
             <Label htmlFor="match-group">Grupa *</Label>
-            <Select value={group} onValueChange={(v) => setGroup(v as "A" | "B")}>
+            <Select
+              value={group}
+              onValueChange={(v) => {
+                setGroup(v as "A" | "B");
+                // Reset team IDs when group changes
+                setHomeTeamId("");
+                setAwayTeamId("");
+              }}
+            >
               <SelectTrigger id="match-group">
                 <SelectValue />
               </SelectTrigger>
