@@ -83,6 +83,11 @@ export function EditMatchDialog({ matchId, open, onOpenChange }: EditMatchDialog
       return;
     }
 
+    if (!time) {
+      alert("Izaberite vreme");
+      return;
+    }
+
     if (!homeTeamId || !awayTeamId) {
       alert("Izaberite oba tima");
       return;

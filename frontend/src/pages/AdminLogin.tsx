@@ -49,7 +49,7 @@ export default function AdminLogin() {
         title="Admin Login - District Padel"
         description="Administratorska prijava za District Padel League"
         keywords="admin login, district padel admin, administratorska prijava"
-        canonicalUrl="https://districtpadel.rs/admin/login"
+        canonicalUrl="https://districtpadelclub.com/admin/login"
       />
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center min-h-[60vh]">

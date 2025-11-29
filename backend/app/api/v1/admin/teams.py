@@ -372,9 +372,14 @@ async def activate_team_endpoint(
     Reactivate an archived team.
     """
     team = await activate_team(db, team_id)
-    await db.flush()
-    await db.refresh(team, ["team_players", "team_players.player"])
     await db.commit()
+    
+    # Reload team with relationships for response
+    query = select(Team).where(Team.id == team.id).options(
+        selectinload(Team.team_players).selectinload(TeamPlayer.player)
+    )
+    result = await db.execute(query)
+    team = result.scalar_one()
     
     players = [
         TeamPlayerResponse(

@@ -40,13 +40,13 @@ export default function Admin() {
         title="Admin Dashboard - District Padel"
         description="Administratorski panel za upravljanje ligom"
         keywords="admin, district padel, liga admin"
-        canonicalUrl="https://districtpadel.rs/admin"
+        canonicalUrl="https://districtpadelclub.com/admin"
       />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Upravljanje ligom, timovima i mecevima</p>
+            <p className="text-muted-foreground">Upravljanje ligom, timovima i Mečevima</p>
           </div>
           <Button variant="outline" onClick={handleLogout}>
             <LogOut className="w-4 h-4 mr-2" />
@@ -58,7 +58,7 @@ export default function Admin() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="pregled">Pregled lige</TabsTrigger>
             <TabsTrigger value="timovi">Timovi</TabsTrigger>
-            <TabsTrigger value="utakmice">Mecevi</TabsTrigger>
+            <TabsTrigger value="utakmice">Mečevi</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pregled" className="space-y-4">
