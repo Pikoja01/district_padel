@@ -34,7 +34,7 @@ export default function Home() {
 
       <main>
         <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 gradient-hero opacity-20 dark:opacity-20 opacity-30" />
+          <div className="absolute inset-0 gradient-hero opacity-30 dark:opacity-20" />
           <div
             className="absolute inset-0 bg-cover bg-center dark:opacity-20 opacity-40"
             style={{ backgroundImage: `url(${heroBackground})` }}
