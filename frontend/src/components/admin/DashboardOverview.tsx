@@ -61,7 +61,7 @@ export function DashboardOverview() {
           <Card className="glass p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Odigrane utakmice</p>
+                <p className="text-sm text-muted-foreground mb-1">Odigrani mecevi</p>
                 <p className="text-3xl font-bold">{stats?.matches?.played || 0}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Zakazane: {stats?.matches?.scheduled || 0}
@@ -118,7 +118,7 @@ export function DashboardOverview() {
                   <TableHead className="w-16">Poz</TableHead>
                   <TableHead>Tim</TableHead>
                   <TableHead className="text-center">Grupa</TableHead>
-                  <TableHead className="text-center">Utakmice</TableHead>
+                  <TableHead className="text-center">Mecevi</TableHead>
                   <TableHead className="text-center">Pobede</TableHead>
                   <TableHead className="text-center">Porazi</TableHead>
                   <TableHead className="text-center">Bodovi</TableHead>

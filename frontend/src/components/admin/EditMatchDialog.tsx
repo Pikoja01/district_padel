@@ -131,9 +131,9 @@ export function EditMatchDialog({ matchId, open, onOpenChange }: EditMatchDialog
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Izmeni utakmicu</DialogTitle>
+          <DialogTitle>Izmeni mec</DialogTitle>
           <DialogDescription>
-            Izmenite datum, vreme, grupu i timove za utakmicu.
+            Izmenite datum, vreme, grupu i timove za mec.
           </DialogDescription>
         </DialogHeader>
 

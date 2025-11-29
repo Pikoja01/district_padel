@@ -111,7 +111,7 @@ export default function League() {
                 <TableHead className="w-16">Poz</TableHead>
                 <TableHead>Tim</TableHead>
                 <TableHead className="text-center">Grupa</TableHead>
-                <TableHead className="text-center">Utakmice</TableHead>
+                <TableHead className="text-center">Mecevi</TableHead>
                 <TableHead className="text-center">Pobede</TableHead>
                 <TableHead className="text-center">Porazi</TableHead>
                 <TableHead className="text-center">Set razlika</TableHead>

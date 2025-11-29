@@ -97,7 +97,7 @@ export function MatchesManagement() {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>Greška pri učitavanju utakmica</AlertDescription>
+        <AlertDescription>Greška pri učitavanju meceva</AlertDescription>
       </Alert>
     );
   }
@@ -188,10 +188,10 @@ export function MatchesManagement() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Utakmice</h2>
+        <h2 className="text-2xl font-bold">Mecevi</h2>
         <Button className="gradient-hero" onClick={() => setCreateDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
-          Zakazi utakmicu
+          Zakazi mec
         </Button>
       </div>
 
@@ -274,7 +274,7 @@ export function MatchesManagement() {
         </Card>
       ) : sortedMatches.length === 0 ? (
         <Card className="glass p-8 text-center text-muted-foreground">
-          Nema zakazanih utakmica. Zakazite prvu utakmicu.
+          Nema zakazanih meceva. Zakazite prvi mec.
         </Card>
       ) : (
         <div className="rounded-lg border border-border overflow-x-auto glass">
@@ -284,7 +284,7 @@ export function MatchesManagement() {
                 <TableHead>Datum</TableHead>
                 <TableHead>Kolo</TableHead>
                 <TableHead>Grupa</TableHead>
-                <TableHead>Utakmica</TableHead>
+                <TableHead>Mec</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead>Rezultat</TableHead>
                 <TableHead className="text-right">Akcije</TableHead>
@@ -353,7 +353,7 @@ export function MatchesManagement() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setEditDialogMatchId(match.id)}
-                        title="Izmeni utakmicu"
+                        title="Izmeni mec"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -371,7 +371,7 @@ export function MatchesManagement() {
                         size="sm"
                         onClick={() => handleDeleteClick(match.id)}
                         disabled={deleteMatch.isPending}
-                        title="Obriši utakmicu"
+                        title="Obriši mec"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -403,12 +403,12 @@ export function MatchesManagement() {
       <AlertDialog open={!!deleteDialogMatchId} onOpenChange={(open) => !open && setDeleteDialogMatchId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Potvrda brisanja utakmice</AlertDialogTitle>
+            <AlertDialogTitle>Potvrda brisanja meca</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li ste sigurni da želite da obrišete utakmicu <strong>{deleteDialogMatchName}</strong>?
+              Da li ste sigurni da želite da obrišete mec <strong>{deleteDialogMatchName}</strong>?
               <br />
               <br />
-              Ova akcija je nepovratna i svi podaci o ovoj utakmici će biti trajno obrisani.
+              Ova akcija je nepovratna i svi podaci o ovom mecu će biti trajno obrisani.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

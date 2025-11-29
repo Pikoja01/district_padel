@@ -126,7 +126,7 @@ export function EnterResultDialog({ matchId, open, onOpenChange }: EnterResultDi
     }
 
     if (filledSets.length > 3) {
-      alert("Utakmica može imati maksimalno 3 seta");
+      alert("Mec može imati maksimalno 3 seta");
       return;
     }
 
@@ -173,7 +173,7 @@ export function EnterResultDialog({ matchId, open, onOpenChange }: EnterResultDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Unesi rezultat utakmice</DialogTitle>
+          <DialogTitle>Unesi rezultat meca</DialogTitle>
           <DialogDescription>
             {homeTeamName} vs {awayTeamName}
           </DialogDescription>
@@ -253,7 +253,7 @@ export function EnterResultDialog({ matchId, open, onOpenChange }: EnterResultDi
               </div>
 
               <div className="text-sm text-muted-foreground">
-                <p>Unesite broj gemova za svaki set. Utakmica se igra najbolje od 3 seta.</p>
+                <p>Unesite broj gemova za svaki set. Mec se igra najbolje od 3 seta.</p>
               </div>
             </div>
 

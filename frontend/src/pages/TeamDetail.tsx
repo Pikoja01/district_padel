@@ -108,7 +108,7 @@ export default function TeamDetail() {
     <>
       <SEOHead
         title={`${team.name} - District Padel Liga | Tim Profil`}
-        description={`Pogledajte profil, statistike i rezultate tima ${team.name} u District Padel Ligi. Igrači, utakmice i plasman u tabeli.`}
+        description={`Pogledajte profil, statistike i rezultate tima ${team.name} u District Padel Ligi. Igrači, mecevi i plasman u tabeli.`}
         keywords={`${team.name}, padel tim, padel liga, district padel, grupa ${team.group}`}
         canonicalUrl={`https://districtpadel.rs/teams/${teamId}`}
         structuredData={structuredData}
@@ -183,18 +183,18 @@ export default function TeamDetail() {
           <div>
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
               <Trophy className="w-6 h-6 text-primary" />
-              Nedavne utakmice
+              Nedavni mecevi
             </h2>
             {matchesError ? (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Greška pri učitavanju utakmica. Molimo pokušajte ponovo.
+                  Greška pri učitavanju meceva. Molimo pokušajte ponovo.
                 </AlertDescription>
               </Alert>
             ) : teamMatches.length === 0 ? (
               <Card className="glass p-8 text-center text-muted-foreground">
-                Još nema odigranih utakmica
+                Još nema odigranih meceva
               </Card>
             ) : (
               <div className="space-y-4">
