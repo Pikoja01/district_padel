@@ -9,7 +9,7 @@ export function Footer() {
           <div>
             <h3 className="font-bold text-lg mb-4">District Padel Club</h3>
             <p className="text-sm text-muted-foreground">
-              Najmoderniji padel centar u Srbiji. Pridružite se našoj zajednici i uživajte u vrhunskim terenima.
+              Najmoderniji padel centar u Srbiji. Pridružite se našoj zajednici i uživajte u vrhunskom terenu.
             </p>
           </div>
 
