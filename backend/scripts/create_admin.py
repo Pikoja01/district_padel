@@ -52,7 +52,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python scripts/create_admin.py <username> <email>")
         print("\nExample:")
-        print("  python scripts/create_admin.py admin admin@districtpadel.rs")
+        print("  python scripts/create_admin.py admin admin@districtpadelclub.com")
         sys.exit(1)
     
     username = sys.argv[1]

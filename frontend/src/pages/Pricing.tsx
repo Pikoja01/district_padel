@@ -11,7 +11,7 @@ export default function Pricing() {
         title="Cenovnik - District Padel Club | Cene Terena i Teretane"
         description="Pogledajte cenovnik District Padel Club-a. Povoljni termini za padel, paketi za teretanu i iznajmljivanje opreme. Najbolje cene u Srbiji."
         keywords="padel cene, cenovnik padel, iznajmljivanje terena cena, teretana cena, padel srbija cene"
-        canonicalUrl="https://districtpadel.rs/pricing"
+        canonicalUrl="https://districtpadelclub.com/pricing"
       />
 
       <main className="container mx-auto px-4 py-8">

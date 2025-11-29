@@ -10,7 +10,7 @@ const Index = () => {
         title="Dobrodošli u District Padel"
         description="Vaša vrhunska padel destinacija u Sremskoj Mitrovici"
         keywords="padel srbija, padel sremska mitrovica, padel klub srbija, padel teren srbija, district padel, dobrodošli"
-        canonicalUrl="https://districtpadel.rs/"
+        canonicalUrl="https://districtpadelclub.com/"
       />
       <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center space-y-6 px-4">

@@ -10,7 +10,7 @@ export default function Courts() {
         title="Padel Teren i Teretana - District Padel Club | Sremska Mitrovica"
         description="Vrhunski padel teren i moderna privatna teretana u Sremskoj Mitrovici. Profesionalna oprema, stakleni zidovi, 90-minutni ekskluzivni treninzi."
         keywords="padel teren srbija, teretana sremska mitrovica, privatna teretana, padel court, gym"
-        canonicalUrl="https://districtpadel.rs/courts"
+        canonicalUrl="https://districtpadelclub.com/courts"
       />
 
       <main className="container mx-auto px-4 py-8">

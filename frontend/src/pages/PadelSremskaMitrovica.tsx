@@ -39,7 +39,7 @@ export default function PadelSremskaMitrovica() {
         title="Padel Sremska Mitrovica - District Padel Club | Najbolji Padel Tereni"
         description="District Padel Club - vodeći padel centar u Sremskoj Mitrovici. Jedan vrhunski teren, naša liga i privatna teretana. Rezervišite danas!"
         keywords="padel sremska mitrovica, padel klub sremska mitrovica, padel teren sremska mitrovica, district padel"
-        canonicalUrl="https://districtpadel.rs/padel-sremska-mitrovica"
+        canonicalUrl="https://districtpadelclub.com/padel-sremska-mitrovica"
         structuredData={structuredData}
       />
 

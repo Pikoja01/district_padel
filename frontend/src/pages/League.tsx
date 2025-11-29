@@ -49,7 +49,7 @@ export default function League() {
         title="Padel Liga Srbija - District Padel League | Tabela i Rezultati"
         description="Pratite najuzbudljiviju padel ligu u Srbiji. Pogledajte tabelu, rezultate, timove i statistike. District Padel League - gde se rađaju šampioni."
         keywords="padel liga srbija, padel liga, padel turnir, padel tabela, padel rezultati, district padel liga"
-        canonicalUrl="https://districtpadel.rs/league"
+        canonicalUrl="https://districtpadelclub.com/league"
         structuredData={structuredData}
       />
 
@@ -59,7 +59,7 @@ export default function League() {
             <span className="gradient-text">District Padel Liga</span>
           </h1>
           <p className="text-lg text-muted-foreground">
-            Pratite tabelu, rezultate i statistike najboljih padel timova u Srbiji.
+            Pratite tabelu, rezultate i statistike padel timova iz naše lige.
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export default function League() {
                 <TableHead className="w-16">Poz</TableHead>
                 <TableHead>Tim</TableHead>
                 <TableHead className="text-center">Grupa</TableHead>
-                <TableHead className="text-center">Mecevi</TableHead>
+                <TableHead className="text-center">Mečevi</TableHead>
                 <TableHead className="text-center">Pobede</TableHead>
                 <TableHead className="text-center">Porazi</TableHead>
                 <TableHead className="text-center">Set razlika</TableHead>

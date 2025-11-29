@@ -19,7 +19,7 @@ export default function Home() {
       addressCountry: "RS",
     },
     sport: "Padel",
-    url: "https://districtpadel.rs",
+    url: "https://districtpadelclub.com",
   };
 
   return (
@@ -28,7 +28,7 @@ export default function Home() {
         title="District Padel Club - Najbolji Padel Centar u Srbiji | Sremska Mitrovica"
         description="District Padel Club - vrhunski padel teren i privatna teretana u Sremskoj Mitrovici. Naša liga, turniri i moderna oprema. Rezervišite teren danas!"
         keywords="padel srbija, padel sremska mitrovica, padel klub srbija, padel teren srbija, padel liga srbija, district padel"
-        canonicalUrl="https://districtpadel.rs/"
+        canonicalUrl="https://districtpadelclub.com/"
         structuredData={structuredData}
       />
 

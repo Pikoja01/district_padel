@@ -14,7 +14,7 @@ export function SEOHead({
   description,
   keywords,
   canonicalUrl,
-  ogImage = "https://districtpadel.rs/og-image.jpg",
+  ogImage = "https://districtpadelclub.com/og-image.jpg",
   structuredData,
 }: SEOHeadProps) {
   useEffect(() => {

@@ -22,7 +22,7 @@ export default function About() {
         title="O nama - District Padel Club | Najbolji Padel Klub u Srbiji"
         description="Upoznajte District Padel Club - vodeći padel centar u Srbiji. Naša misija, vrednosti i vizija. Pridružite se padel revoluciji!"
         keywords="o nama, padel klub srbija, district padel, padel centar, padel zajednica"
-        canonicalUrl="https://districtpadel.rs/about"
+        canonicalUrl="https://districtpadelclub.com/about"
         structuredData={structuredData}
       />
 
