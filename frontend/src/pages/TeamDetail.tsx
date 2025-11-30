@@ -171,7 +171,10 @@ export default function TeamDetail() {
                 <Card key={player.id} className="glass p-6">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-bold text-lg">{player.name}</h3>
-                    <Badge variant={player.role === "main" ? "default" : "secondary"}>
+                    <Badge 
+                      variant={player.role === "main" ? "default" : "secondary"}
+                      className={player.role === "reserve" ? "bg-[hsl(84_81%_44%)] text-[hsl(220_17%_7%)] border-transparent" : ""}
+                    >
                       {player.role === "main" ? "Glavni" : "Rezerva"}
                     </Badge>
                   </div>

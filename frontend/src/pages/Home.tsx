@@ -1,12 +1,26 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Trophy, Users, Calendar } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SEOHead } from "@/components/layout/SEOHead";
+import { useTheme } from "next-themes";
 import logo from "@/assets/district-logo.png";
+import logoBlack from "@/assets/district_padel_black.png";
 import heroBackground from "@/assets/hero-pozadina_1.jpg";
 
 export default function Home() {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Use black logo for light mode, regular logo for dark mode
+  const currentLogo = mounted && theme === "light" ? logoBlack : logo;
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "SportsActivityLocation",
@@ -43,7 +57,7 @@ export default function Home() {
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto text-center space-y-6">
               <div className="flex justify-center mb-8">
-                <img src={logo} alt="District Padel Club" className="w-full max-w-2xl h-auto" />
+                <img src={currentLogo} alt="District Padel Club" className="w-full max-w-2xl h-auto" />
               </div>
               <p className="text-xl md:text-2xl text-foreground">
                 Najmoderniji padel centar u Srbiji. Vrhunski teren, naša liga i nezaboravna iskustva.

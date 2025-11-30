@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTheme } from "next-themes";
 import logo from "@/assets/district-logo.png";
+import logoBlack from "@/assets/district_padel_black.png";
 
 const navLinks = [
   { name: "Početna", path: "/" },
@@ -16,13 +18,23 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Use black logo for light mode, regular logo for dark mode
+  const currentLogo = mounted && theme === "light" ? logoBlack : logo;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
-            <img src={logo} alt="District Padel Club" className="h-10 w-auto" />
+            <img src={currentLogo} alt="District Padel Club" className="h-10 w-auto" />
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
